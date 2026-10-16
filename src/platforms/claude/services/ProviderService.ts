@@ -3,23 +3,23 @@ import { ClaudeProviderPreset } from '@/types/provider'
 import { ClaudeEnvConfig } from '@/types/account'
 
 export class ClaudeProviderService {
-  async getCurrentConfig(): Promise<ClaudeEnvConfig> {
-    return await invoke<ClaudeEnvConfig>('get_claude_provider_config')
-  }
-
+  /**
+   * 应用供应商预设：
+   * 读取当前 ~/.claude/settings.json，保留用户已有的顶层配置（permissions 等），
+   * 仅整体替换 `env` 块（避免残留上一个供应商的 BASE_URL）。
+   */
   async applyProvider(preset: ClaudeProviderPreset, apiKey: string): Promise<void> {
-    const config: ClaudeEnvConfig = {
+    const current = await invoke<Record<string, unknown>>('get_claude_config')
+
+    const config: ClaudeEnvConfig & Record<string, unknown> = {
+      ...current,
       env: {
         ...preset.config.env,
         ANTHROPIC_AUTH_TOKEN: apiKey,
       },
     }
-    
-    await invoke('apply_claude_provider', { config })
-  }
 
-  async applyConfig(config: ClaudeEnvConfig): Promise<void> {
-    await invoke('apply_claude_provider', { config })
+    await invoke('switch_claude_account', { settings: JSON.stringify(config) })
   }
 }
 

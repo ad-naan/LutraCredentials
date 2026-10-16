@@ -3,17 +3,23 @@ import { GeminiProviderPreset } from '@/types/provider'
 import { GeminiConfig } from '@/types/account'
 
 export class GeminiProviderService {
-  async getCurrentConfig(): Promise<GeminiConfig> {
-    return await invoke<GeminiConfig>('get_gemini_provider_config')
-  }
+  /**
+   * 应用供应商预设：
+   * 保留用户现有的 config.json / settings.json，整体替换 `.env`
+   * （避免残留上一个供应商的 BASE_URL），走原子写路径（switch_gemini_account）。
+   */
+  async applyProvider(preset: GeminiProviderPreset, apiKey: string): Promise<void> {
+    const current = await invoke<GeminiConfig>('get_gemini_config')
 
-  async applyProvider(_preset: GeminiProviderPreset, _apiKey: string): Promise<void> {
-    // TODO: Implement provider preset application logic
-    throw new Error('Not implemented')
-  }
+    const config: GeminiConfig = {
+      ...current,
+      env: {
+        ...preset.config.env,
+        GEMINI_API_KEY: apiKey,
+      },
+    }
 
-  async applyConfig(config: GeminiConfig): Promise<void> {
-    await invoke('apply_gemini_provider', { config })
+    await invoke('switch_gemini_account', { settings: JSON.stringify(config) })
   }
 }
 

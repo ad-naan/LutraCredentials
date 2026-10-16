@@ -320,12 +320,6 @@ pub fn run() {
             zcode::refresh_zcode_token,
             zcode::switch_zcode_account,
             // Provider 命令
-            commands::provider::get_claude_provider_config,
-            commands::provider::apply_claude_provider,
-            commands::provider::get_codex_provider_config,
-            commands::provider::apply_codex_provider,
-            commands::provider::get_gemini_provider_config,
-            commands::provider::apply_gemini_provider,
             commands::provider::get_platform_versions,
             commands::provider::get_antigravity_path_info,
             commands::provider::detect_antigravity_executable,

@@ -3,17 +3,21 @@ import { CodexProviderPreset } from '@/types/provider'
 import { CodexConfig } from '@/types/account'
 
 export class CodexProviderService {
-  async getCurrentConfig(): Promise<CodexConfig> {
-    return await invoke<CodexConfig>('get_codex_provider_config')
-  }
+  /**
+   * 应用供应商预设：
+   * 预设完整定义 auth.json + config.toml 内容，注入 API Key 后
+   * 走与账号切换相同的原子写路径（switch_codex_account）。
+   */
+  async applyProvider(preset: CodexProviderPreset, apiKey: string): Promise<void> {
+    const config: CodexConfig = {
+      auth: {
+        ...preset.config.auth,
+        OPENAI_API_KEY: apiKey,
+      },
+      config: preset.config.config,
+    }
 
-  async applyProvider(_preset: CodexProviderPreset, _apiKey: string): Promise<void> {
-    // TODO: Implement provider preset application logic
-    throw new Error('Not implemented')
-  }
-
-  async applyConfig(config: CodexConfig): Promise<void> {
-    await invoke('apply_codex_provider', { config })
+    await invoke('switch_codex_account', { settings: JSON.stringify(config) })
   }
 }
 
