@@ -32,29 +32,55 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const v = process.env.PACKAGE_VERSION;
             const { data } = await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: `v${process.env.PACKAGE_VERSION}`,
-              name: `Nexus Account Manager v${process.env.PACKAGE_VERSION}`,
-              body: `## 📦 下载说明 / Download Guide
+              tag_name: `v${v}`,
+              name: `LutraCredentials v${v}`,
+              body: `## 🎉 v2.0.0 更新日志 / What's New
+
+            ### ✨ 新增
+            - **新平台支持**：Cursor、Windsurf、CodeBuddy、WorkBuddy、Qoder、Trae 本地账号一键导入与切换
+            - **官方 OAuth 登录**：Claude / Codex 订阅账号直接授权导入
+            - **本地路由代理**：HTTP 代理 + 上游故障转移 + 竞速 / 最低延迟聚合模式
+            - **AI 用量统计**：请求量、Token 消耗、缓存命中、成本估算与 14 天趋势
+            - **API 端点测速**：供应商选择时实时比较延迟
+            - **数据安全**：备份恢复、运行日志查看、凭据自动刷新
+            - **「数据与路径」页面**：集中管理数据存储、备份、日志与本地平台路径
+            - **版本号菜单**：右上角版本号可点击，快速检查更新
+            - **更新日志看板**：每次更新后可查看具体变更内容
+
+            ### 🎨 改进
+            - 全新「岩灰湖绿」视觉设计，支持浅色 / 深色主题
+            - 项目品牌正式更名为 LutraCredentials
+            - 平台账号操作统一契约，架构解耦，扩展新平台更简单
+
+            ### 🔧 修复
+            - 自动刷新按间隔动态计算令牌过期提前量，启动时立即检查
+            - Windows 控制台非 UTF-8 编码输出乱码
+            - OAuth 数据序列化命名不一致导致的导入失败
+
+            ---
+
+            ## 📦 下载说明 / Download Guide
 
             ### Windows
             - **Windows 10/11 (64-bit)**: 下载 \`.msi\` 或 \`.exe\` 文件
-              - \`Nexus-Account-Manager_${process.env.PACKAGE_VERSION}_x64_en-US.msi\` - MSI 安装包（推荐）
-              - \`Nexus-Account-Manager_${process.env.PACKAGE_VERSION}_x64-setup.exe\` - EXE 安装包
+              - \`LutraCredentials_${v}_x64_en-US.msi\` - MSI 安装包（推荐）
+              - \`LutraCredentials_${v}_x64-setup.exe\` - EXE 安装包
 
             ### macOS
             - **Apple Silicon (M1/M2/M3)**: 下载 \`aarch64\` 版本
-              - \`Nexus-Account-Manager_${process.env.PACKAGE_VERSION}_aarch64.dmg\`
+              - \`LutraCredentials_${v}_aarch64.dmg\`
             - **Intel 芯片**: 下载 \`x64\` 版本
-              - \`Nexus-Account-Manager_${process.env.PACKAGE_VERSION}_x64.dmg\`
+              - \`LutraCredentials_${v}_x64.dmg\`
 
             ### Linux
             - **Debian/Ubuntu**: 下载 \`.deb\` 文件
-              - \`nexus-account-manager_${process.env.PACKAGE_VERSION}_amd64.deb\`
+              - \`lutracredentials_${v}_amd64.deb\`
             - **其他发行版**: 下载 \`.AppImage\` 文件
-              - \`nexus-account-manager_${process.env.PACKAGE_VERSION}_amd64.AppImage\`
+              - \`LutraCredentials_${v}_amd64.AppImage\`
 
             ---
 
@@ -77,13 +103,7 @@ jobs:
             \`\`\`bash
             uname -m
             \`\`\`
-            - 输出 \`x86_64\` → 下载 amd64 版本
-
-            ---
-
-            ## 📝 更新日志
-
-            查看完整更新日志请访问 [CHANGELOG.md](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CHANGELOG.md)`,
+            - 输出 \`x86_64\` → 下载 amd64 版本`,
               draft: true,
               prerelease: false
             })

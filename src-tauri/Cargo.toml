@@ -1,6 +1,6 @@
 [package]
 name = "lutra-credentials"
-version = "1.0.3"
+version = "2.0.0"
 description = "A unified multi-platform AI account management tool"
 authors = ["adnaan", "027xigupi"]
 edition = "2021"
