@@ -14,12 +14,6 @@ export const kiroConfig: PlatformConfig = {
 
   AccountList: KiroAccountList,
 
-  features: {
-    machineId: true,
-    autoRefresh: true,
-    quota: true,
-  },
-
   accountOps: kiroAccountOps,
 
   addMethods: [

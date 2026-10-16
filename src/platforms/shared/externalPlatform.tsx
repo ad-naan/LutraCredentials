@@ -1691,12 +1691,8 @@ export function createExternalPlatformConfig(
     color: definition.color,
     description: definition.description,
     AccountList,
-    features: {
-      quota: false,
-      autoRefresh: false,
-      machineId: false,
-    },
     accountOps: createExternalAccountOps(definition),
+
     addMethods: createExternalAddMethods(definition),
   }
 }

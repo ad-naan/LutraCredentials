@@ -4,6 +4,7 @@ import { codexIcon } from '@/platforms/icons'
 import { CodexAccountList } from './components/AccountList'
 import { JsonMethod } from './methods/JsonMethod'
 import { OAuthMethod } from './methods/OAuthMethod'
+import { codexAccountOps } from './accountOps'
 
 export const codexConfig: PlatformConfig = {
   id: 'codex',
@@ -14,11 +15,7 @@ export const codexConfig: PlatformConfig = {
 
   AccountList: CodexAccountList,
 
-  features: {
-    machineId: false,
-    autoRefresh: false,
-    quota: true,
-  },
+  accountOps: codexAccountOps,
 
   addMethods: [
     {

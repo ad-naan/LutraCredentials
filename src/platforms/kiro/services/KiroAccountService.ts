@@ -45,28 +45,6 @@ export interface CheckStatusResult {
     isBanned?: boolean
 }
 
-export interface BatchRefreshResult {
-    successCount: number
-    failedCount: number
-    results: Array<{
-        id: string
-        success: boolean
-        data?: RefreshTokenResult
-        error?: string
-    }>
-}
-
-export interface BatchCheckResult {
-    successCount: number
-    failedCount: number
-    results: Array<{
-        id: string
-        success: boolean
-        data?: CheckStatusResult
-        error?: string
-    }>
-}
-
 export class KiroAccountService {
     /**
      * Switch to a Kiro account.
@@ -281,65 +259,6 @@ export class KiroAccountService {
                 status: isBanned ? 'banned' : 'error',
                 error: errorMessage,
                 isBanned
-            }
-        }
-    }
-
-    /**
-     * Batch refresh tokens (background operation).
-     */
-    static async batchRefresh(
-        accounts: Array<{
-            id: string
-            email: string
-            credentials: KiroAccount['credentials']
-        }>,
-        concurrency: number = 10
-    ): Promise<BatchRefreshResult> {
-        try {
-            return await invoke<BatchRefreshResult>('kiro_batch_refresh', {
-                accounts,
-                concurrency
-            })
-        } catch (error) {
-            return {
-                successCount: 0,
-                failedCount: accounts.length,
-                results: accounts.map(acc => ({
-                    id: acc.id,
-                    success: false,
-                    error: error instanceof Error ? error.message : 'Unknown error'
-                }))
-            }
-        }
-    }
-
-    /**
-     * Batch check account status (background operation).
-     */
-    static async batchCheck(
-        accounts: Array<{
-            id: string
-            email: string
-            credentials: KiroAccount['credentials']
-            idp?: string
-        }>,
-        concurrency: number = 10
-    ): Promise<BatchCheckResult> {
-        try {
-            return await invoke<BatchCheckResult>('kiro_batch_check', {
-                accounts,
-                concurrency
-            })
-        } catch (error) {
-            return {
-                successCount: 0,
-                failedCount: accounts.length,
-                results: accounts.map(acc => ({
-                    id: acc.id,
-                    success: false,
-                    error: error instanceof Error ? error.message : 'Unknown error'
-                }))
             }
         }
     }

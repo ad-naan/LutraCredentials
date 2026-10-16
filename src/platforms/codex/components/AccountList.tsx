@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button'
 import { usePlatformStore } from '@/stores/usePlatformStore'
 import { useTranslation } from 'react-i18next'
 import { Download, LayoutGrid, List, Search } from 'lucide-react'
-import { invoke } from '@tauri-apps/api/core'
 import { toast } from 'sonner'
 import type { Account, CodexAccount } from '@/types/account'
 import { usePlatformVersions } from '@/hooks/usePlatformVersions'
@@ -21,7 +20,7 @@ type ViewMode = 'grid' | 'list'
 export function CodexAccountList() {
   const { t } = useTranslation()
   const accounts = usePlatformStore((state) => state.accounts)
-  const updateAccount = usePlatformStore((state) => state.updateAccount)
+  const switchAccount = usePlatformStore((state) => state.switchAccount)
   const [exportOpen, setExportOpen] = useState(false)
   const [isSwitching, setIsSwitching] = useState(false)
   const [editAccount, setEditAccount] = useState<CodexAccount | null>(null)
@@ -52,69 +51,17 @@ export function CodexAccountList() {
     })
   }, [codexAccounts, deferredSearchQuery])
 
-  const setSwitchAccount = async (account: Account) => {
+  const handleSwitchAccount = async (account: Account) => {
     if (account.platform !== 'codex') return
-    
-    const codexAccount = account as CodexAccount
-    
+
     // 防止重复切换
     if (isSwitching) return
-    
+
     setIsSwitching(true)
-    
+
     try {
-      if (codexAccount.oauth) {
-        // ChatGPT OAuth 账号：先刷新 token，再以托管格式写 auth.json
-        let oauth = codexAccount.oauth
-        try {
-          const refreshed = await invoke<CodexAccount['oauth']>('codex_oauth_refresh', {
-            refreshToken: oauth.refresh_token,
-            idToken: oauth.id_token,
-          })
-          if (refreshed?.access_token) {
-            oauth = { ...oauth, ...refreshed }
-          }
-        } catch (e) {
-          // 刷新失败时沿用现有凭据继续切换
-          logError('Failed to refresh Codex OAuth token:', e)
-        }
-
-        await invoke('codex_oauth_switch', { credentials: JSON.stringify(oauth) })
-
-        await Promise.all(
-          codexAccounts
-            .filter((acc) => acc.id !== account.id && acc.isActive)
-            .map((acc) => updateAccount(acc.id, { isActive: false })),
-        )
-        await updateAccount(account.id, { oauth, isActive: true, lastUsedAt: Date.now() })
-
-        toast.success(t('codex.switchSuccess', 'Codex account switched successfully'))
-        return
-      }
-
-      // API Key / 第三方中转账号：写 auth.json + config.toml
-      const config = codexAccount.config
-
-      if (!config) {
-        toast.error(t('codex.errors.noConfig', 'Configuration not found in account'))
-        return
-      }
-      
-      await invoke('switch_codex_account', { settings: JSON.stringify(config) })
-      
-      // 将其他账户设置为非激活状态
-      const updatePromises = codexAccounts
-        .filter(acc => acc.id !== account.id && acc.isActive)
-        .map(acc => updateAccount(acc.id, { isActive: false }))
-      
-      await Promise.all(updatePromises)
-      
-      // 更新当前账户为激活状态
-      await updateAccount(account.id, { 
-        isActive: true,
-        lastUsedAt: Date.now()
-      })
-      
+      // 切号、同平台其它账号的激活状态与凭据补丁统一由 store 依据 accountOps 契约处理
+      await switchAccount(account.id)
       toast.success(t('codex.switchSuccess', 'Codex account switched successfully'))
     } catch (error: any) {
       logError('Failed to switch Codex account:', error)
@@ -237,7 +184,7 @@ export function CodexAccountList() {
                 <CodexAccountCard
                   key={account.id}
                   account={account}
-                  onSwitch={() => setSwitchAccount(account)}
+                  onSwitch={() => handleSwitchAccount(account)}
                   onExport={() => setExportOpen(true)}
                   onEdit={account.oauth ? undefined : () => setEdit(account)}
                 />
@@ -246,7 +193,7 @@ export function CodexAccountList() {
           ) : (
             <AccountTable
               accounts={filteredAccounts}
-              onSwitch={setSwitchAccount}
+              onSwitch={handleSwitchAccount}
               onEdit={setEdit}
               isSwitching={isSwitching}
             />

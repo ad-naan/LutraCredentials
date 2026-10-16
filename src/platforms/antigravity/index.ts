@@ -14,13 +14,6 @@ export const antigravityConfig: PlatformConfig = {
 
   AccountList: AntigravityAccountList,
 
-  features: {
-    oauth: true,
-    quota: true,
-    proxy: true,
-    autoRefresh: true,
-  },
-
   accountOps: antigravityAccountOps,
 
   addMethods: [

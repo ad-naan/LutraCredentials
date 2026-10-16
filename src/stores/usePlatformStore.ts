@@ -86,8 +86,7 @@ interface PlatformStore {
   checkAccountStatus: (id: string) => Promise<void>
   batchRefreshAccounts: (ids: string[]) => Promise<void>
   batchCheckAccountStatus: (ids: string[]) => Promise<void>
-  canSwitch: (platform: string) => boolean
-  canRefresh: (platform: string) => boolean
+
   
   // Auto-refresh management
   startAutoRefresh: () => void
@@ -230,9 +229,6 @@ export const usePlatformStore = create<PlatformStore>((set, get) => ({
 
   // ==================== 通用账号操作（accountOps 驱动） ====================
 
-  canSwitch: (platform) => Boolean(getAccountOps(platform)?.switchAccount),
-
-  canRefresh: (platform) => Boolean(getAccountOps(platform)?.refresh),
 
   switchAccount: async (id) => {
     const account = get().accounts.find((a) => a.id === id)

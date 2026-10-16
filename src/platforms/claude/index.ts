@@ -3,6 +3,7 @@ import { FileJson, KeyRound } from 'lucide-react'
 import { claudeIcon } from '@/platforms/icons'
 import { ClaudeAccountList } from './components/AccountList'
 import { JsonMethod, OAuthMethod } from './methods'
+import { claudeAccountOps } from './accountOps'
 
 export const claudeConfig: PlatformConfig = {
   id: 'claude',
@@ -13,11 +14,7 @@ export const claudeConfig: PlatformConfig = {
 
   AccountList: ClaudeAccountList,
 
-  features: {
-    machineId: false,
-    autoRefresh: false,
-    quota: true,
-  },
+  accountOps: claudeAccountOps,
 
   addMethods: [
     {

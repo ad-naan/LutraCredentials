@@ -8,8 +8,8 @@ import { toast } from '@/lib/toast'
 import { Edit, CheckCircle, BarChart3 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { usePlatformStore } from '@/stores/usePlatformStore'
-import { invoke } from '@tauri-apps/api/core'
-import type { ClaudeAccount, ClaudeUsage } from '@/types/account'
+import { ClaudeAccountService } from '../services/ClaudeAccountService'
+import type { ClaudeAccount } from '@/types/account'
 
 interface ClaudeAccountCardProps {
   account: ClaudeAccount
@@ -29,16 +29,9 @@ export const ClaudeAccountCard = memo(function ClaudeAccountCard({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
   const deleteAccount = usePlatformStore(state => state.deleteAccount)
-  const updateAccount = usePlatformStore(state => state.updateAccount)
-  const setActiveAccount = usePlatformStore(state => state.setActiveAccount)
+  const refreshAccount = usePlatformStore(state => state.refreshAccount)
 
   const isOAuth = !!account.oauth
-
-  const handleSwitch = () => {
-    setActiveAccount(account)
-    toast.success(t('accounts.switchSuccess'), account.email)
-    onSwitch?.()
-  }
 
   const handleDelete = async () => {
     try {
@@ -49,22 +42,12 @@ export const ClaudeAccountCard = memo(function ClaudeAccountCard({
     }
   }
 
+  // API Key / 中转站账号：校验密钥是否可用
   const handleVerify = async () => {
     try {
       setIsVerifying(true)
 
-      // 从账户配置中获取 API Key
-      const apiKey = account.config?.env.ANTHROPIC_API_KEY || account.config?.env.ANTHROPIC_AUTH_TOKEN
-      if (!apiKey) {
-        toast.error(t('platforms.claude.errors.noApiKey'))
-        return
-      }
-
-      // 调用 Rust 后端验证 API Key
-      const result = await invoke<{ valid: boolean; message: string }>('verify_claude_api_key', {
-        apiKey,
-        baseUrl: account.config?.env.ANTHROPIC_BASE_URL
-      })
+      const result = await ClaudeAccountService.verifyApiKey(account)
 
       if (result.valid) {
         toast.success(t('platforms.claude.verifySuccess'))
@@ -78,33 +61,18 @@ export const ClaudeAccountCard = memo(function ClaudeAccountCard({
     }
   }
 
-  // OAuth 账号：刷新 token 并更新订阅用量
+  // OAuth 账号：刷新凭据并更新订阅用量（由 store 依据 accountOps 契约执行）
   const handleRefreshUsage = async () => {
     if (!account.oauth) return
 
+    setIsVerifying(true)
     try {
-      setIsVerifying(true)
-
-      let oauth = account.oauth
-      try {
-        const refreshed = await invoke<ClaudeAccount['oauth']>('claude_oauth_refresh', {
-          refreshToken: oauth.refresh_token,
-        })
-        if (refreshed?.access_token) {
-          oauth = { ...oauth, ...refreshed }
-        }
-      } catch (e) {
-        // token 刷新失败时用现有凭据尝试查询
+      const success = await refreshAccount(account.id)
+      if (success) {
+        toast.success(t('platforms.claude.usage.refreshed', 'Usage refreshed'))
+      } else {
+        toast.error(t('platforms.claude.usage.refreshFailed', 'Failed to refresh usage'))
       }
-
-      const usage = await invoke<ClaudeUsage>('claude_oauth_usage', {
-        accessToken: oauth.access_token,
-      })
-      await updateAccount(account.id, { oauth, usage })
-
-      toast.success(t('platforms.claude.usage.refreshed', 'Usage refreshed'))
-    } catch (e: any) {
-      toast.error(t('platforms.claude.usage.refreshFailed', 'Failed to refresh usage'), e.message || t('common.unknownError'))
     } finally {
       setIsVerifying(false)
     }
@@ -151,7 +119,7 @@ export const ClaudeAccountCard = memo(function ClaudeAccountCard({
             </div>
           )
         }
-        onSwitch={handleSwitch}
+        onSwitch={onSwitch}
         onExport={onExport}
         onDetails={() => setDetailsOpen(true)}
         onDelete={() => setDeleteConfirmOpen(true)}

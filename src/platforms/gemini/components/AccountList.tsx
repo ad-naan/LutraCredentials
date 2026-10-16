@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button'
 import { usePlatformStore } from '@/stores/usePlatformStore'
 import { useTranslation } from 'react-i18next'
 import { Download, LayoutGrid, List, Search } from 'lucide-react'
-import { invoke } from '@tauri-apps/api/core'
 import { toast } from 'sonner'
 import type { Account, GeminiAccount } from '@/types/account'
 import { usePlatformVersions } from '@/hooks/usePlatformVersions'
@@ -21,7 +20,7 @@ type ViewMode = 'grid' | 'list'
 export function GeminiAccountList() {
   const { t } = useTranslation()
   const accounts = usePlatformStore((state) => state.accounts)
-  const updateAccount = usePlatformStore((state) => state.updateAccount)
+  const switchAccount = usePlatformStore((state) => state.switchAccount)
   const [exportOpen, setExportOpen] = useState(false)
   const [isSwitching, setIsSwitching] = useState(false)
   const [editAccount, setEditAccount] = useState<GeminiAccount | null>(null)
@@ -54,38 +53,15 @@ export function GeminiAccountList() {
 
   const setSwitchAccount = async (account: Account) => {
     if (account.platform !== 'gemini') return
-    
-    const geminiAccount = account as GeminiAccount
-    
+
     // 防止重复切换
     if (isSwitching) return
-    
-    setIsSwitching(true)
-    
-    try {
-      // 1. 调用 Rust 后端切换账户配置（包含回填逻辑）
-      const config = geminiAccount.config
 
-      if (!config) {
-        toast.error(t('gemini.errors.noConfig', 'Configuration not found in account'))
-        return
-      }
-      
-      await invoke('switch_gemini_account', { settings: JSON.stringify(config) })
-      
-      // 2. 将其他账户设置为非激活状态
-      const updatePromises = geminiAccounts
-        .filter(acc => acc.id !== account.id && acc.isActive)
-        .map(acc => updateAccount(acc.id, { isActive: false }))
-      
-      await Promise.all(updatePromises)
-      
-      // 3. 更新当前账户为激活状态
-      await updateAccount(account.id, { 
-        isActive: true,
-        lastUsedAt: Date.now()
-      })
-      
+    setIsSwitching(true)
+
+    try {
+      // 切号、同平台其它账号的激活状态与配置写入统一由 store 依据 accountOps 契约处理
+      await switchAccount(account.id)
       toast.success(t('gemini.switchSuccess', 'Gemini account switched successfully'))
     } catch (error: any) {
       logError('Failed to switch Gemini account:', error)

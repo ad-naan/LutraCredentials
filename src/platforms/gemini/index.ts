@@ -3,6 +3,7 @@ import { FileJson } from 'lucide-react'
 import { geminiIcon } from '@/platforms/icons'
 import { GeminiAccountList } from './components/AccountList'
 import { JsonMethod } from './methods/JsonMethod'
+import { geminiAccountOps } from './accountOps'
 
 export const geminiConfig: PlatformConfig = {
   id: 'gemini',
@@ -13,11 +14,7 @@ export const geminiConfig: PlatformConfig = {
 
   AccountList: GeminiAccountList,
 
-  features: {
-    machineId: false,
-    autoRefresh: false,
-    quota: false,
-  },
+  accountOps: geminiAccountOps,
 
   addMethods: [
     {

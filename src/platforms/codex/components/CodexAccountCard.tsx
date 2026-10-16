@@ -7,8 +7,7 @@ import { toast } from '@/lib/toast'
 import { Edit, BarChart3 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { usePlatformStore } from '@/stores/usePlatformStore'
-import { invoke } from '@tauri-apps/api/core'
-import type { CodexAccount, CodexUsage } from '@/types/account'
+import type { CodexAccount } from '@/types/account'
 
 interface CodexAccountCardProps {
   account: CodexAccount
@@ -28,15 +27,9 @@ export const CodexAccountCard = memo(function CodexAccountCard({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [isChecking, setIsChecking] = useState(false)
   const deleteAccount = usePlatformStore(state => state.deleteAccount)
-  const updateAccount = usePlatformStore(state => state.updateAccount)
+  const refreshAccount = usePlatformStore(state => state.refreshAccount)
 
   const isOAuth = !!account.oauth
-
-  const handleSwitch = () => {
-    if (onSwitch) {
-      onSwitch()
-    }
-  }
 
   const handleDelete = async () => {
     try {
@@ -47,38 +40,18 @@ export const CodexAccountCard = memo(function CodexAccountCard({
     }
   }
 
-  // OAuth 账号：刷新 token 并查询订阅状态
+  // OAuth 账号：刷新凭据并查询订阅状态（由 store 依据 accountOps 契约执行）
   const handleCheckPlan = async () => {
     if (!account.oauth) return
 
+    setIsChecking(true)
     try {
-      setIsChecking(true)
-
-      let oauth = account.oauth
-      try {
-        const refreshed = await invoke<CodexAccount['oauth']>('codex_oauth_refresh', {
-          refreshToken: oauth.refresh_token,
-          idToken: oauth.id_token,
-        })
-        if (refreshed?.access_token) {
-          oauth = { ...oauth, ...refreshed }
-        }
-      } catch (e) {
-        // token 刷新失败时用现有凭据尝试查询
+      const success = await refreshAccount(account.id)
+      if (success) {
+        toast.success(t('platforms.codex.usage.refreshed', 'Subscription refreshed'))
+      } else {
+        toast.error(t('platforms.codex.usage.refreshFailed', 'Failed to refresh subscription'))
       }
-
-      const usage = await invoke<CodexUsage>('codex_check_quota', {
-        accessToken: oauth.access_token,
-        accountId: oauth.account_id || null,
-      })
-      await updateAccount(account.id, { oauth, usage })
-
-      toast.success(
-        t('platforms.codex.usage.refreshed', 'Subscription refreshed'),
-        usage.plan || undefined,
-      )
-    } catch (e: any) {
-      toast.error(t('platforms.codex.usage.refreshFailed', 'Failed to refresh subscription'), e.message || t('common.unknownError'))
     } finally {
       setIsChecking(false)
     }
@@ -103,7 +76,7 @@ export const CodexAccountCard = memo(function CodexAccountCard({
             )}
           </>
         }
-        onSwitch={handleSwitch}
+        onSwitch={onSwitch}
         onExport={onExport}
         onDetails={() => setDetailsOpen(true)}
         onDelete={() => setDeleteConfirmOpen(true)}

@@ -43,8 +43,9 @@ pub struct OAuthSession {
 }
 
 /// OAuth Token 响应
+///
+/// 序列化为 snake_case，与前端 `ClaudeOAuthData` 及落盘数据保持一致。
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
 pub struct OAuthTokens {
     pub access_token: String,
     pub refresh_token: String,
@@ -54,7 +55,6 @@ pub struct OAuthTokens {
 
 /// 账号资料
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
 pub struct OAuthProfile {
     pub email: Option<String>,
     pub name: Option<String>,
@@ -63,7 +63,6 @@ pub struct OAuthProfile {
 
 /// 订阅用量（api.anthropic.com/api/oauth/usage 解析结果）
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
-#[serde(rename_all = "camelCase")]
 pub struct OAuthUsage {
     pub five_hour_percentage: Option<i32>,
     pub five_hour_reset_time: Option<String>,

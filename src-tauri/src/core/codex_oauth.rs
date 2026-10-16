@@ -35,12 +35,15 @@ pub struct DeviceAuthSession {
 }
 
 /// 单次轮询结果
+///
+/// `status` 为变体名（snake_case）；`Authorized` 的字段按前端 `PollResult` 约定序列化为 camelCase。
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "status", rename_all = "snake_case")]
 pub enum DevicePollStatus {
     /// 用户尚未完成授权，继续轮询
     Pending,
     /// 授权完成，携带交换所需的 code + verifier
+    #[serde(rename_all = "camelCase")]
     Authorized {
         authorization_code: String,
         code_verifier: String,
@@ -48,8 +51,9 @@ pub enum DevicePollStatus {
 }
 
 /// OAuth Token 集合
+///
+/// 序列化为 snake_case，与前端 `CodexOAuthData` 及落盘数据保持一致。
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
 pub struct OAuthTokens {
     pub id_token: String,
     pub access_token: String,

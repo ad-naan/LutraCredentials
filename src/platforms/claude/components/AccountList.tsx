@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button'
 import { usePlatformStore } from '@/stores/usePlatformStore'
 import { useTranslation } from 'react-i18next'
 import { Download, LayoutGrid, List, Search } from 'lucide-react'
-import { invoke } from '@tauri-apps/api/core'
 import { toast } from 'sonner'
 import type { Account, ClaudeAccount } from '@/types/account'
 import { usePlatformVersions } from '@/hooks/usePlatformVersions'
@@ -21,7 +20,7 @@ type ViewMode = 'grid' | 'list'
 export function ClaudeAccountList() {
   const { t } = useTranslation()
   const accounts = usePlatformStore((state) => state.accounts)
-  const updateAccount = usePlatformStore((state) => state.updateAccount)
+  const switchAccount = usePlatformStore((state) => state.switchAccount)
   const [exportOpen, setExportOpen] = useState(false)
   const [isSwitching, setIsSwitching] = useState(false)
   const [editAccount, setEditAccount] = useState<ClaudeAccount | null>(null)
@@ -52,68 +51,17 @@ export function ClaudeAccountList() {
     })
   }, [claudeAccounts, deferredSearchQuery])
 
-  const setSwitchAccount = async (account: Account) => {
+  const handleSwitchAccount = async (account: Account) => {
     if (account.platform !== 'claude') return
-    
-    const claudeAccount = account as ClaudeAccount
-    
+
     // 防止重复切换
     if (isSwitching) return
-    
+
     setIsSwitching(true)
-    
+
     try {
-      if (claudeAccount.oauth) {
-        // 官方 OAuth 账号：先刷新 token，再写入 .credentials.json
-        let oauth = claudeAccount.oauth
-        try {
-          const refreshed = await invoke<ClaudeAccount['oauth']>('claude_oauth_refresh', {
-            refreshToken: oauth.refresh_token,
-          })
-          if (refreshed?.access_token) {
-            oauth = { ...oauth, ...refreshed }
-          }
-        } catch (e) {
-          // 刷新失败时沿用现有凭据继续切换
-          logError('Failed to refresh Claude OAuth token:', e)
-        }
-
-        await invoke('claude_oauth_switch', { credentials: JSON.stringify(oauth) })
-
-        await Promise.all(
-          claudeAccounts
-            .filter((acc) => acc.id !== account.id && acc.isActive)
-            .map((acc) => updateAccount(acc.id, { isActive: false })),
-        )
-        await updateAccount(account.id, { oauth, isActive: true, lastUsedAt: Date.now() })
-
-        toast.success(t('claude.switchSuccess', 'Account switched successfully'))
-        return
-      }
-
-      // API Key / 中转站账号：写 settings.json env
-      const config = claudeAccount.config
-
-      if (!config) {
-        toast.error(t('claude.errors.noApiKey', 'API Key not found in account config'))
-        return
-      }
-      
-      await invoke('switch_claude_account', { settings: JSON.stringify(config) })
-      
-      // 将其他账户设置为非激活状态
-      const updatePromises = claudeAccounts
-        .filter(acc => acc.id !== account.id && acc.isActive)
-        .map(acc => updateAccount(acc.id, { isActive: false }))
-      
-      await Promise.all(updatePromises)
-      
-      // 更新当前账户为激活状态
-      await updateAccount(account.id, { 
-        isActive: true,
-        lastUsedAt: Date.now()
-      })
-      
+      // 切号、同平台其它账号的激活状态与凭据补丁统一由 store 依据 accountOps 契约处理
+      await switchAccount(account.id)
       toast.success(t('claude.switchSuccess', 'Account switched successfully'))
     } catch (error: any) {
       logError('Failed to switch Claude account:', error)
@@ -236,7 +184,7 @@ export function ClaudeAccountList() {
                 <ClaudeAccountCard
                   key={account.id}
                   account={account}
-                  onSwitch={() => setSwitchAccount(account)}
+                  onSwitch={() => handleSwitchAccount(account)}
                   onExport={() => setExportOpen(true)}
                   onEdit={account.oauth ? undefined : () => setEdit(account)}
                 />
@@ -245,7 +193,7 @@ export function ClaudeAccountList() {
           ) : (
             <AccountTable
               accounts={filteredAccounts}
-              onSwitch={setSwitchAccount}
+              onSwitch={handleSwitchAccount}
               onEdit={setEdit}
               isSwitching={isSwitching}
             />

@@ -93,13 +93,7 @@ export interface Quota {
   resetAt?: string
 }
 
-export interface PlatformFeatures {
-  oauth?: boolean
-  quota?: boolean
-  proxy?: boolean
-  machineId?: boolean
-  autoRefresh?: boolean
-}
+
 
 export interface PlatformConfig {
   id: string
@@ -110,11 +104,6 @@ export interface PlatformConfig {
 
   // 页面组件
   AccountList: ComponentType<any>
-  AccountDetail?: ComponentType<any>
-  Settings?: ComponentType<any>
-
-  // 特性标志
-  features: PlatformFeatures
 
   // 账号操作契约（切号 / 刷新 / 状态检测），由 store 统一调度
   accountOps?: PlatformAccountOps
