@@ -20,6 +20,7 @@ pub mod speedtest;
 pub mod state_db;
 pub mod trae;
 pub mod updater;
+pub mod usage;
 pub mod windsurf;
 pub mod zcode;
 pub mod zed;

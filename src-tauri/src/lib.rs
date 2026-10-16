@@ -322,6 +322,7 @@ pub fn run() {
             // Provider 命令
             commands::provider::get_platform_versions,
             commands::speedtest::test_api_endpoints,
+            commands::usage::scan_session_usage,
             commands::provider::get_antigravity_path_info,
             commands::provider::detect_antigravity_executable,
             commands::provider::select_antigravity_executable,

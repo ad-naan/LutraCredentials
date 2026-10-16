@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Activity, ArrowRight, Clock3, Layers, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { UsageWidget } from '@/components/common/UsageWidget'
 import { usePlatformVersions } from '@/hooks/usePlatformVersions'
 import { getAllPlatforms } from '@/platforms/registry'
 import { usePlatformStore } from '@/stores/usePlatformStore'
@@ -61,6 +62,8 @@ export function Dashboard() {
           </section>
         ))}
       </div>
+
+      <UsageWidget />
 
       <section className="surface">
         <div className="surface-heading">

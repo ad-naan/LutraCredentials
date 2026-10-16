@@ -448,5 +448,16 @@
         "relaunchError": "Failed to restart application, please restart manually",
         "retry": "Retry",
         "close": "Close"
+    },
+    "usage": {
+        "title": "Usage Stats",
+        "totalRequests": "Total Requests",
+        "totalTokens": "Total Tokens",
+        "cacheHitRate": "Cache Hit Rate",
+        "estimatedCost": "Est. Cost",
+        "recentTrend": "Request Trend (14 days)",
+        "topModels": "Top Models",
+        "scanning": "Scanning sessions...",
+        "noData": "No usage data yet"
     }
 }

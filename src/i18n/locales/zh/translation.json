@@ -447,5 +447,16 @@
         "errorDescription": "更新过程中出现错误，请稍后重试",
         "retry": "重试",
         "close": "关闭"
+    },
+    "usage": {
+        "title": "用量统计",
+        "totalRequests": "总请求",
+        "totalTokens": "总 Token",
+        "cacheHitRate": "缓存命中",
+        "estimatedCost": "估算成本",
+        "recentTrend": "近14天请求趋势",
+        "topModels": "常用模型",
+        "scanning": "正在扫描会话...",
+        "noData": "暂无用量数据"
     }
 }
