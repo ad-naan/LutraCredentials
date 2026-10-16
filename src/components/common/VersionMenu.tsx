@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { invoke } from '@tauri-apps/api/core'
-import { Loader2, RefreshCw } from 'lucide-react'
+import { History, Loader2, RefreshCw } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { UpdateDialog } from '@/components/dialogs/UpdateDialog'
+import { ChangelogDialog } from '@/components/dialogs/ChangelogDialog'
 import { toast } from '@/lib/toast'
 import { logError } from '@/lib/logger'
 import packageJson from '../../../package.json'
@@ -29,6 +30,7 @@ export function VersionMenu() {
   const [checking, setChecking] = useState(false)
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [changelogOpen, setChangelogOpen] = useState(false)
 
   const handleCheckUpdate = async () => {
     setChecking(true)
@@ -69,6 +71,10 @@ export function VersionMenu() {
             )}
             {checking ? t('update.checking') : t('update.checkNow')}
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setChangelogOpen(true)}>
+            <History className="h-4 w-4" />
+            {t('changelog.menuItem')}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -77,6 +83,8 @@ export function VersionMenu() {
         onOpenChange={setDialogOpen}
         updateInfo={updateInfo}
       />
+
+      <ChangelogDialog open={changelogOpen} onOpenChange={setChangelogOpen} />
     </>
   )
 }

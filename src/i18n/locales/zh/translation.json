@@ -490,6 +490,18 @@
         "retry": "重试",
         "close": "关闭"
     },
+    "changelog": {
+        "title": "更新日志",
+        "description": "共 {{count}} 个版本，每次更新后的变更都会记录在这里",
+        "menuItem": "更新日志",
+        "viewButton": "查看更新日志",
+        "current": "当前版本",
+        "kinds": {
+            "added": "新增",
+            "improved": "改进",
+            "fixed": "修复"
+        }
+    },
     "usage": {
         "title": "用量统计",
         "totalRequests": "总请求",

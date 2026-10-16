@@ -6,6 +6,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { UpdateDialog } from '@/components/dialogs/UpdateDialog'
+import { ChangelogDialog } from '@/components/dialogs/ChangelogDialog'
+import { CHANGELOG } from '@/data/changelog'
 import { ProxySettings } from '@/components/common/ProxySettings'
 import { usePlatformStore } from '@/stores/usePlatformStore'
 import { toast } from '@/lib/toast'
@@ -19,6 +21,7 @@ import {
   Info,
   RefreshCw,
   Sparkles,
+  History,
 } from 'lucide-react'
 
 interface UpdateInfo {
@@ -36,6 +39,7 @@ export function Settings() {
   const [checkingUpdate, setCheckingUpdate] = useState(false)
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null)
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
+  const [showChangelog, setShowChangelog] = useState(false)
   const autoRefreshEnabled = usePlatformStore((state) => state.autoRefreshEnabled)
   const autoRefreshInterval = usePlatformStore((state) => state.autoRefreshInterval)
   const setAutoRefresh = usePlatformStore((state) => state.setAutoRefresh)
@@ -220,6 +224,27 @@ export function Settings() {
               </Button>
             </div>
           </div>
+
+          <div className="border-t border-border pt-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <h4 className="flex items-center gap-2 text-sm font-medium">
+                  <History className="h-4 w-4" />
+                  {t('changelog.title')}
+                </h4>
+                <p className="text-xs text-muted-foreground">{t('changelog.description', { count: CHANGELOG.length })}</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowChangelog(true)}
+                className="bg-background hover:bg-muted"
+              >
+                <History className="mr-2 h-4 w-4" />
+                {t('changelog.viewButton')}
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -228,6 +253,8 @@ export function Settings() {
         onOpenChange={setShowUpdateDialog}
         updateInfo={updateInfo}
       />
+
+      <ChangelogDialog open={showChangelog} onOpenChange={setShowChangelog} />
     </div>
   )
 }

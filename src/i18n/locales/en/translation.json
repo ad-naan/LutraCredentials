@@ -491,6 +491,18 @@
         "retry": "Retry",
         "close": "Close"
     },
+    "changelog": {
+        "title": "Changelog",
+        "description": "{{count}} releases — every update's changes are recorded here",
+        "menuItem": "Changelog",
+        "viewButton": "View Changelog",
+        "current": "Current",
+        "kinds": {
+            "added": "Added",
+            "improved": "Improved",
+            "fixed": "Fixed"
+        }
+    },
     "usage": {
         "title": "Usage Stats",
         "totalRequests": "Total Requests",

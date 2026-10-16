@@ -218,6 +218,33 @@
 .add-platform-option--active { border-color: hsl(var(--primary) / .45); background: hsl(var(--accent)); color: hsl(var(--primary)); }
 
 .lutra-dialog { width: calc(100vw - 32px); max-height: calc(100dvh - 48px); overflow-y: auto; border-radius: 12px; background: hsl(var(--popover)); box-shadow: var(--shadow-dialog); }
+
+/* ---------------------------------------------------------------------------
+   Changelog board: a vertical release timeline inside the changelog dialog.
+   --------------------------------------------------------------------------- */
+.changelog-board { display: flex; flex-direction: column; gap: 0; max-height: min(56dvh, 480px); overflow-y: auto; padding: 2px 4px 6px 2px; }
+.changelog-release { position: relative; padding: 0 0 18px 22px; }
+.changelog-release::before { content: ''; position: absolute; left: 5px; top: 14px; bottom: -4px; width: 1px; background: hsl(var(--border)); }
+.changelog-release:last-child { padding-bottom: 4px; }
+.changelog-release:last-child::before { display: none; }
+.changelog-release-dot { position: absolute; left: 0; top: 5px; width: 11px; height: 11px; border: 2px solid hsl(var(--primary)); border-radius: 50%; background: hsl(var(--popover)); }
+.changelog-release-head { display: flex; align-items: center; gap: 8px; min-height: 20px; }
+.changelog-release-version { margin: 0; font-size: 14px; font-weight: 650; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.changelog-release-badge { padding: 1px 7px; border-radius: 999px; background: hsl(var(--primary) / 12%); color: hsl(var(--primary)); font-size: 10px; font-weight: 600; white-space: nowrap; }
+.changelog-release-date { margin-left: auto; color: hsl(var(--muted-foreground)); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.changelog-release-body { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.changelog-group { display: flex; flex-direction: column; gap: 5px; }
+.changelog-kind { display: inline-flex; align-items: center; gap: 5px; width: fit-content; padding: 1px 8px; border-radius: 5px; font-size: 10px; font-weight: 600; letter-spacing: .02em; }
+.changelog-kind svg { width: 11px; height: 11px; }
+.changelog-kind--added { background: hsl(142 60% 45% / 12%); color: hsl(142 60% 32%); }
+.dark .changelog-kind--added { color: hsl(142 55% 62%); }
+.changelog-kind--improved { background: hsl(217 80% 55% / 12%); color: hsl(217 70% 45%); }
+.dark .changelog-kind--improved { color: hsl(213 80% 68%); }
+.changelog-kind--fixed { background: hsl(28 80% 50% / 14%); color: hsl(25 70% 40%); }
+.dark .changelog-kind--fixed { color: hsl(32 85% 62%); }
+.changelog-items { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0 0 0 2px; list-style: none; }
+.changelog-items li { position: relative; padding-left: 14px; color: hsl(var(--foreground) / 88%); font-size: 12px; line-height: 1.55; }
+.changelog-items li::before { content: ''; position: absolute; left: 2px; top: 8px; width: 4px; height: 4px; border-radius: 50%; background: hsl(var(--muted-foreground) / 60%); }
 .lutra-dialog-header { padding-right: 24px; }
 .lutra-dialog-section { display: flex; flex-direction: column; gap: 10px; }
 .lutra-dialog-section-label { font-size: 12px; font-weight: 600; }
