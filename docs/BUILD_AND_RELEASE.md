@@ -2,9 +2,9 @@
 
 ## 应用信息
 
-- **应用名称**: Nexus Account Manager
-- **标识符**: com.nexus.account-manager
-- **当前版本**: 1.0.0
+- **应用名称**: LutraCredentials
+- **标识符**: com.lutra.credentials
+- **当前版本**: 1.0.3
 - **描述**: 统一的多平台 AI 账户管理工具
 
 ## 本地构建

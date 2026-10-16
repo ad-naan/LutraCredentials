@@ -1,8 +1,8 @@
-# Nexus Account Manager - Architecture
+# LutraCredentials - Architecture
 
 ## 🎯 Design Philosophy
 
-Nexus is built on three core principles:
+LutraCredentials is built on three core principles:
 
 1. **Extensibility**: Adding new platforms should be trivial
 2. **Type Safety**: Full type safety across Rust and TypeScript
@@ -111,8 +111,8 @@ Tauri command handlers:
 - `add_account()`: Add new account
 - `update_account()`: Update existing account
 - `delete_account()`: Delete account
-- `export_accounts()`: Export to JSON
-- `import_accounts()`: Import from JSON
+- `backup_accounts()`: Backup all accounts to JSON
+- `restore_accounts()`: Restore accounts from backup (merge/replace)
 
 ## 🔄 Data Flow
 
@@ -230,9 +230,9 @@ Input (Form)
 ```
 
 ### Storage Location
-- **Windows**: `%APPDATA%\com.administrator.nexus-account-manager\accounts.json`
-- **macOS**: `~/Library/Application Support/com.administrator.nexus-account-manager/accounts.json`
-- **Linux**: `~/.config/com.administrator.nexus-account-manager/accounts.json`
+- **Windows**: `%APPDATA%\com.lutra.credentials\accounts.json`
+- **macOS**: `~/Library/Application Support/com.lutra.credentials/accounts.json`
+- **Linux**: `~/.config/com.lutra.credentials/accounts.json`
 
 ## 🚀 Performance Considerations
 

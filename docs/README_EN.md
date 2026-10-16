@@ -182,8 +182,8 @@ Download the native installer for your OS from the [Releases](../../releases) pa
 
 ```bash
 # Clone the repository
-git clone https://github.com/ad-naan/nexus-account-manager.git
-cd nexus-account-manager
+git clone https://github.com/ad-naan/LutraCredentials.git
+cd LutraCredentials
 
 # Install frontend dependencies
 npm install
@@ -227,7 +227,7 @@ Full development guide: [API_PLATFORMS_GUIDE.md](./API_PLATFORMS_GUIDE.md)
 ## 8. Project Structure
 
 ```text
-nexus-account-manager/
+LutraCredentials/
 ├── src/                          # React frontend
 │   ├── components/ui             # Shared UI primitives
 │   ├── platforms                 # Plugin-based AI platform modules

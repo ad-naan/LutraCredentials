@@ -121,7 +121,7 @@ export function ExportDialog({ open, onClose, accounts: propAccounts, selectedId
             txt: 'txt',
             csv: 'csv'
         }
-        const filename = `nexus-accounts-${new Date().toISOString().slice(0, 10)}.${extensions[selectedFormat]}`
+        const filename = `lutra-accounts-${new Date().toISOString().slice(0, 10)}.${extensions[selectedFormat]}`
         const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')

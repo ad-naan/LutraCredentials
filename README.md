@@ -178,8 +178,8 @@
 
 ```bash
 # 克隆项目仓库
-git clone https://github.com/ad-naan/nexus-account-manager.git
-cd nexus-account-manager
+git clone https://github.com/ad-naan/LutraCredentials.git
+cd LutraCredentials
 
 # 安装前端依赖
 npm install
@@ -220,7 +220,7 @@ npm run tauri:build
 ## 八、项目目录规范
 
 ```text
-nexus-account-manager/
+LutraCredentials/
 ├── src/                          # React 前端业务代码
 │   ├── components/ui             # 全局通用基础组件
 │   ├── platforms                 # 插件化 AI 平台业务模块

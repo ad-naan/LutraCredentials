@@ -1,8 +1,8 @@
-# Nexus Account Manager
+# LutraCredentials
 
 <div align="center">
 
-<img src="src-tauri/icons/icon.png" alt="Nexus Account Manager" width="150" height="150" />
+<img src="src-tauri/icons/icon.png" alt="LutraCredentials" width="150" height="150" />
 
 ### 🚀 Unified Management for Your AI Accounts
 
@@ -33,15 +33,15 @@
 [![Rust](https://img.shields.io/badge/Rust-1.70+-orange?style=flat-square&logo=rust)](https://www.rust-lang.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 
-[![Windows](https://img.shields.io/badge/Windows-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/ad-naan/nexus-account-manager/releases)
-[![macOS](https://img.shields.io/badge/macOS-000000?style=flat-square&logo=apple&logoColor=white)](https://github.com/ad-naan/nexus-account-manager/releases)
-[![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black)](https://github.com/ad-naan/nexus-account-manager/releases)
+[![Windows](https://img.shields.io/badge/Windows-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/ad-naan/LutraCredentials/releases)
+[![macOS](https://img.shields.io/badge/macOS-000000?style=flat-square&logo=apple&logoColor=white)](https://github.com/ad-naan/LutraCredentials/releases)
+[![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black)](https://github.com/ad-naan/LutraCredentials/releases)
 
 </div>
 
 ---
 
-## 🎯 Why Choose Nexus?
+## 🎯 Why Choose LutraCredentials?
 
 <table>
 <tr>
@@ -187,7 +187,7 @@
 
 ```mermaid
 graph TB
-    A[Nexus Core] --> B[Platform Registry]
+    A[LutraCredentials Core] --> B[Platform Registry]
     B --> C[Antigravity]
     B --> D[Kiro]
     B --> E[Claude]
@@ -356,7 +356,7 @@ graph TB
 
 ```mermaid
 graph TB
-    A[Nexus Core] --> B[Platform Registry]
+    A[LutraCredentials Core] --> B[Platform Registry]
     B --> C[Antigravity]
     B --> D[Kiro]
     B --> E[Claude]
@@ -429,7 +429,7 @@ graph TB
 
 <div align="center">
 
-| Metric | Traditional | Nexus | Improvement |
+| Metric | Traditional | LutraCredentials | Improvement |
 |:---:|:---:|:---:|:---:|
 | **Startup Time** | ~3s | ~1s | ⚡ 67% |
 | **Memory Usage** | ~150MB | ~50MB | 📉 67% |
@@ -447,7 +447,7 @@ graph TB
 
 <div align="center">
 
-Visit the [Releases page](https://github.com/ad-naan/nexus-account-manager/releases) to download the installer for your system:
+Visit the [Releases page](https://github.com/ad-naan/LutraCredentials/releases) to download the installer for your system:
 
 | Platform | File Format | Notes |
 |:---:|:---:|:---|
@@ -488,8 +488,8 @@ graph LR
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/nexus-account-manager.git
-cd nexus-account-manager
+git clone https://github.com/yourusername/LutraCredentials.git
+cd LutraCredentials
 
 # Install dependencies
 npm install
@@ -554,7 +554,7 @@ sudo pacman -S webkit2gtk-4.1 \
 ## 🏗️ Project Structure
 
 ```
-nexus-account-manager/
+LutraCredentials/
 ├── src/                          # React frontend
 │   ├── components/
 │   │   ├── ui/                  # Base UI components (Radix UI)
@@ -787,7 +787,7 @@ npm run type-check       # Run TypeScript type checking
 - Zustand DevTools: Built-in state inspection
 
 #### Backend
-- Logs are in `~/.local/share/com.nexus.account-manager/logs/app.log`
+- Logs are in `~/.local/share/com.lutra.credentials/logs/app.log`
 - Use `log_info!()`, `log_warn!()`, `log_error!()` for debugging
 - Attach debugger: `rust-lldb` or `rust-gdb`
 
@@ -808,8 +808,8 @@ We welcome contributions! Here's how you can help:
 
 1. **Fork the Repository**
    ```bash
-   git clone https://github.com/yourusername/nexus-account-manager.git
-   cd nexus-account-manager
+   git clone https://github.com/yourusername/LutraCredentials.git
+   cd LutraCredentials
    git checkout -b feature/your-feature-name
    ```
 
@@ -866,7 +866,7 @@ Thanks to these wonderful people who have contributed to this project:
       <sub>Contributor</sub>
     </td>
     <td align="center">
-      <a href="https://github.com/ad-naan/nexus-account-manager/graphs/contributors">
+      <a href="https://github.com/ad-naan/LutraCredentials/graphs/contributors">
         <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/users.svg" width="100px;" alt="More Contributors"/>
         <br />
         <sub><b>More Contributors</b></sub>
@@ -879,14 +879,14 @@ Thanks to these wonderful people who have contributed to this project:
 
 ### 📈 Project Stats
 
-![GitHub stars](https://img.shields.io/github/stars/ad-naan/nexus-account-manager?style=social)
-![GitHub forks](https://img.shields.io/github/forks/ad-naan/nexus-account-manager?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/ad-naan/nexus-account-manager?style=social)
+![GitHub stars](https://img.shields.io/github/stars/ad-naan/LutraCredentials?style=social)
+![GitHub forks](https://img.shields.io/github/forks/ad-naan/LutraCredentials?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/ad-naan/LutraCredentials?style=social)
 
-![GitHub issues](https://img.shields.io/github/issues/ad-naan/nexus-account-manager?style=flat-square)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/ad-naan/nexus-account-manager?style=flat-square)
-![GitHub last commit](https://img.shields.io/github/last-commit/ad-naan/nexus-account-manager?style=flat-square)
-![GitHub contributors](https://img.shields.io/github/contributors/ad-naan/nexus-account-manager?style=flat-square)
+![GitHub issues](https://img.shields.io/github/issues/ad-naan/LutraCredentials?style=flat-square)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/ad-naan/LutraCredentials?style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/ad-naan/LutraCredentials?style=flat-square)
+![GitHub contributors](https://img.shields.io/github/contributors/ad-naan/LutraCredentials?style=flat-square)
 
 Want to see your name here? [Contribute to the project!](#-contributing)
 
@@ -960,16 +960,16 @@ This project stands on the shoulders of giants:
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=ad-naan/nexus-account-manager&type=Date)](https://star-history.com/#ad-naan/nexus-account-manager&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=ad-naan/LutraCredentials&type=Date)](https://star-history.com/#ad-naan/LutraCredentials&Date)
 
 ---
 
-**Made with ❤️ by the Nexus Team**
+**Made with ❤️ by the LutraCredentials Team**
 
 <p>
-  <a href="#nexus-account-manager">⬆ Back to Top</a> •
-  <a href="https://github.com/ad-naan/nexus-account-manager/issues">Report Issues</a> •
-  <a href="https://github.com/ad-naan/nexus-account-manager/discussions">Discussions</a>
+  <a href="#lutracredentials">⬆ Back to Top</a> •
+  <a href="https://github.com/ad-naan/LutraCredentials/issues">Report Issues</a> •
+  <a href="https://github.com/ad-naan/LutraCredentials/discussions">Discussions</a>
 </p>
 
 <p>

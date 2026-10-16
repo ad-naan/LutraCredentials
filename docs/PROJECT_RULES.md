@@ -37,17 +37,19 @@ lutra-credentials/
 │   │   ├── antigravity/         # Antigravity 平台
 │   │   │   ├── components/     # 平台专属组件
 │   │   │   ├── methods/        # 认证方法（OAuth/Token/Import）
+│   │   │   ├── services/       # 平台服务层
+│   │   │   ├── accountOps.ts   # 平台账号操作契约实现
 │   │   │   └── index.ts        # 平台配置导出
-│   │   ├── claude/              # Claude 平台
-│   │   ├── codex/               # Codex 平台
-│   │   ├── gemini/              # Gemini 平台
+│   │   ├── claude/              # Claude 平台（components/methods/services/accountOps）
+│   │   ├── codex/               # Codex 平台（components/methods/services/accountOps）
+│   │   ├── gemini/              # Gemini 平台（components/services/accountOps）
 │   │   ├── kiro/                # Kiro 平台
 │   │   │   ├── components/
 │   │   │   ├── methods/
 │   │   │   ├── services/       # 平台服务层
 │   │   │   ├── accountOps.ts   # 平台账号操作契约实现
 │   │   │   └── index.ts
-│   │   ├── external/            # 命令式外部平台定义（12 个外部平台）
+│   │   ├── external/            # 命令式外部平台定义（11 个外部平台）
 │   │   │   └── index.tsx
 │   │   ├── shared/              # 外部平台共享渲染器
 │   │   │   └── externalPlatform.tsx
@@ -203,7 +205,6 @@ src/platforms/[platform-name]/
 ├── methods/
 │   ├── index.ts                           # 必需：导出所有认证方法
 │   └── [MethodName]Method.tsx             # 认证方法组件
-├── services/                               # 可选：平台特定服务
 ├── services/                               # 可选：平台特定服务（必须无副作用，只返回 patch）
 │   └── [Platform]Service.ts
 ├── accountOps.ts                           # 可选：平台账号操作契约实现
@@ -217,7 +218,6 @@ src/platforms/[platform-name]/
 - `color`: 主题色
 - `description`: 描述
 - `AccountList`: 账户列表组件
-- `features`: 功能特性配置
 - `accountOps`（可选）: 声明本平台支持的「切号 / 刷新 / 状态检测」能力，见下节
 
 ### 2.4 账号操作契约（accountOps）
@@ -887,7 +887,7 @@ log_debug(&format!("Request payload: {:?}", data));
 
 **双重输出**:
 - 控制台: 带颜色的实时输出
-- 文件: 纯文本日志，保存在 `%APPDATA%/com.nexus.account-manager/logs/app.log`
+- 文件: 纯文本日志，保存在 `%APPDATA%/com.lutra.credentials/logs/app.log`
 
 #### 8.1.3 使用规则
 
