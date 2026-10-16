@@ -7,6 +7,10 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { StorageService } from '@/services/StorageService'
 import { UpdateDialog } from '@/components/dialogs/UpdateDialog'
+import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
+import { LogViewer } from '@/components/common/LogViewer'
+import { usePlatformStore } from '@/stores/usePlatformStore'
+import { toast } from '@/lib/toast'
 import { invoke } from '@tauri-apps/api/core'
 import packageJson from '../../package.json'
 import {
@@ -28,6 +32,8 @@ import {
   Search,
   TriangleAlert,
   HardDrive,
+  Archive,
+  ScrollText,
 } from 'lucide-react'
 
 interface UpdateInfo {
@@ -36,6 +42,21 @@ interface UpdateInfo {
   has_update: boolean
   release_notes?: string
   download_url?: string
+}
+
+interface BackupOutcome {
+  path: string
+  accountCount: number
+  bytes: number
+}
+
+interface RestoreOutcome {
+  path: string
+  mode: string
+  added: number
+  updated: number
+  invalid: number
+  total: number
 }
 
 interface LocalPlatformPathInfo {
@@ -93,6 +114,13 @@ export function Settings() {
   const [checkingUpdate, setCheckingUpdate] = useState(false)
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null)
   const [showUpdateDialog, setShowUpdateDialog] = useState(false)
+  const [backupBusy, setBackupBusy] = useState(false)
+  const [restoreBusy, setRestoreBusy] = useState(false)
+  const [restoreConfirmOpen, setRestoreConfirmOpen] = useState(false)
+  const [showLogViewer, setShowLogViewer] = useState(false)
+  const autoRefreshEnabled = usePlatformStore((state) => state.autoRefreshEnabled)
+  const autoRefreshInterval = usePlatformStore((state) => state.autoRefreshInterval)
+  const setAutoRefresh = usePlatformStore((state) => state.setAutoRefresh)
   const storageService = StorageService.getInstance()
 
   useEffect(() => {
@@ -309,6 +337,66 @@ export function Settings() {
     }
   }
 
+  const handleExportBackup = async () => {
+    setBackupBusy(true)
+    try {
+      // path 为 null 时由后端弹出系统保存对话框
+      const result = await invoke<BackupOutcome | null>('backup_accounts', { path: null })
+      if (!result) {
+        toast.info(t('settings.backupCancelled'))
+        return
+      }
+      toast.success(t('settings.backupDone', { count: result.accountCount }), result.path)
+    } catch (error) {
+      logError('Failed to export backup:', error)
+      toast.error(t('settings.backupFailed'), String(error))
+    } finally {
+      setBackupBusy(false)
+    }
+  }
+
+  const handleRestoreBackup = async () => {
+    setRestoreBusy(true)
+    try {
+      const result = await invoke<RestoreOutcome | null>('restore_accounts', {
+        path: null,
+        mode: 'merge',
+      })
+      if (!result) {
+        toast.info(t('settings.restoreCancelled'))
+        return
+      }
+      toast.success(
+        t('settings.restoreDone', {
+          added: result.added,
+          updated: result.updated,
+          total: result.total,
+        }),
+      )
+      await usePlatformStore.getState().loadAllAccounts()
+    } catch (error) {
+      logError('Failed to restore backup:', error)
+      toast.error(t('settings.restoreFailed'), String(error))
+    } finally {
+      setRestoreBusy(false)
+    }
+  }
+
+  const handleOpenLogDirectory = async () => {
+    try {
+      await invoke('open_log_directory')
+    } catch (error) {
+      logError('Failed to open log directory:', error)
+      toast.error(t('settings.openLogDirFailed'), String(error))
+    }
+  }
+
+  const handleAutoRefreshChange = (enabled: boolean, interval: number) => {
+    if (enabled === autoRefreshEnabled && interval === autoRefreshInterval) return
+    setAutoRefresh(enabled, interval)
+    toast.success(t('settings.autoRefreshSaved'))
+  }
+
   return (
     <div className="page-stack settings-page">
       <div className="page-heading">
@@ -398,19 +486,125 @@ export function Settings() {
           </div>
 
           <div className="border-t border-border pt-6">
-            <h4 className="mb-4 flex items-center gap-2 text-sm font-medium">
-              <Database className="h-4 w-4" />
-              {t('settings.dataManagement')}
+            <h4 className="mb-1 flex items-center gap-2 text-sm font-medium">
+              <Archive className="h-4 w-4" />
+              {t('settings.backupTitle')}
             </h4>
-            <div className="flex gap-3">
-              <Button variant="outline" size="sm" className="bg-background hover:bg-muted">
-                <Upload className="mr-2 h-4 w-4" />
-                {t('settings.importLegacy')}
+            <p className="mb-4 text-xs text-muted-foreground">{t('settings.backupDesc')}</p>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-background hover:bg-muted"
+                disabled={backupBusy}
+                onClick={() => void handleExportBackup()}
+              >
+                {backupBusy ? (
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="mr-2 h-4 w-4" />
+                )}
+                {t('settings.exportBackup')}
               </Button>
-              <Button variant="outline" size="sm" className="bg-background hover:bg-muted">
-                <Download className="mr-2 h-4 w-4" />
-                {t('settings.exportData')}
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-background hover:bg-muted"
+                disabled={restoreBusy}
+                onClick={() => setRestoreConfirmOpen(true)}
+              >
+                {restoreBusy ? (
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="mr-2 h-4 w-4" />
+                )}
+                {t('settings.restoreBackup')}
               </Button>
+            </div>
+            <p className="mt-3 flex items-start gap-2 text-xs text-muted-foreground">
+              <Info className="mt-0.5 h-3 w-3 flex-shrink-0" />
+              <span>{t('settings.restoreModeHint')}</span>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border bg-card shadow-sm">
+        <CardHeader className="border-b border-border pb-4">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-accent p-2 text-primary">
+              <ScrollText className="h-5 w-5" />
+            </div>
+            <div>
+              <CardTitle className="text-xl">{t('settings.logsTitle')}</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">{t('settings.logsDesc')}</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="flex flex-wrap gap-3">
+            <Button
+              variant="outline"
+              className="bg-background hover:bg-muted"
+              onClick={() => setShowLogViewer(true)}
+            >
+              <ScrollText className="mr-2 h-4 w-4" />
+              {t('settings.viewLogs')}
+            </Button>
+            <Button
+              variant="outline"
+              className="bg-background hover:bg-muted"
+              onClick={() => void handleOpenLogDirectory()}
+            >
+              <FolderOpen className="mr-2 h-4 w-4" />
+              {t('settings.openLogDir')}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border bg-card shadow-sm">
+        <CardHeader className="border-b border-border pb-4">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-accent p-2 text-primary">
+              <RefreshCw className="h-5 w-5" />
+            </div>
+            <div>
+              <CardTitle className="text-xl">{t('settings.autoRefreshTitle')}</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">{t('settings.autoRefreshDesc')}</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4 pt-6">
+          <label className="flex items-center gap-3 text-sm">
+            <input
+              type="checkbox"
+              checked={autoRefreshEnabled}
+              onChange={(event) =>
+                handleAutoRefreshChange(event.target.checked, autoRefreshInterval)
+              }
+              className="h-4 w-4 accent-[hsl(var(--primary))]"
+            />
+            {t('settings.autoRefreshEnable')}
+          </label>
+
+          <div className="space-y-2">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {t('settings.autoRefreshInterval')}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[5, 15, 30, 60].map((minutes) => (
+                <Button
+                  key={minutes}
+                  variant={autoRefreshInterval === minutes ? 'default' : 'outline'}
+                  size="sm"
+                  disabled={!autoRefreshEnabled}
+                  onClick={() => handleAutoRefreshChange(autoRefreshEnabled, minutes)}
+                  className={cn(autoRefreshInterval !== minutes && 'bg-background hover:bg-muted')}
+                >
+                  {t('settings.autoRefreshMinutes', { count: minutes })}
+                </Button>
+              ))}
             </div>
           </div>
         </CardContent>
@@ -710,6 +904,17 @@ export function Settings() {
         open={showUpdateDialog}
         onOpenChange={setShowUpdateDialog}
         updateInfo={updateInfo}
+      />
+
+      <LogViewer open={showLogViewer} onOpenChange={setShowLogViewer} />
+
+      <ConfirmDialog
+        open={restoreConfirmOpen}
+        onOpenChange={setRestoreConfirmOpen}
+        title={t('settings.restoreConfirmTitle')}
+        description={t('settings.restoreConfirmDesc')}
+        confirmText={t('settings.restoreBackup')}
+        onConfirm={handleRestoreBackup}
       />
     </div>
   )

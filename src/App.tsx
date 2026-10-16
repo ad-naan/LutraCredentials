@@ -12,6 +12,8 @@ import { Toaster } from "@/components/ui/sonner"
 
 function App() {
   const loadAllAccounts = usePlatformStore((state) => state.loadAllAccounts)
+  const startAutoRefresh = usePlatformStore((state) => state.startAutoRefresh)
+  const stopAutoRefresh = usePlatformStore((state) => state.stopAutoRefresh)
 
   useEffect(() => {
     // 应用启动时加载所有账户
@@ -19,6 +21,12 @@ function App() {
       logError('Failed to load accounts on startup:', error)
     })
   }, [loadAllAccounts])
+
+  useEffect(() => {
+    // 启用后台凭据自动刷新（开关与间隔由设置页管理）
+    startAutoRefresh()
+    return () => stopAutoRefresh()
+  }, [startAutoRefresh, stopAutoRefresh])
 
   return (
     <>

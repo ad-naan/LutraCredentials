@@ -6,9 +6,47 @@ import { getAccountOps } from '@/platforms/accountOps'
 
 // Auto-refresh timer
 let autoRefreshTimer: ReturnType<typeof setInterval> | null = null
-// Auto-refresh interval for account status (5 minutes)
-// Currently not used but reserved for future auto-refresh implementation
-// const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000
+
+const AUTO_REFRESH_STORAGE_KEY = 'lutra.autoRefresh'
+const DEFAULT_AUTO_REFRESH_INTERVAL = 5
+const MIN_AUTO_REFRESH_INTERVAL = 1
+
+interface AutoRefreshSettings {
+  enabled: boolean
+  interval: number
+}
+
+/** 读取持久化的自动刷新配置（默认启用，5 分钟） */
+function loadAutoRefreshSettings(): AutoRefreshSettings {
+  try {
+    const raw = localStorage.getItem(AUTO_REFRESH_STORAGE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<AutoRefreshSettings>
+      const interval = Number(parsed.interval)
+      return {
+        enabled: parsed.enabled !== false,
+        interval:
+          Number.isFinite(interval) && interval >= MIN_AUTO_REFRESH_INTERVAL
+            ? Math.round(interval)
+            : DEFAULT_AUTO_REFRESH_INTERVAL,
+      }
+    }
+  } catch (error) {
+    logError('Failed to read auto-refresh settings:', error)
+  }
+
+  return { enabled: true, interval: DEFAULT_AUTO_REFRESH_INTERVAL }
+}
+
+function persistAutoRefreshSettings(settings: AutoRefreshSettings) {
+  try {
+    localStorage.setItem(AUTO_REFRESH_STORAGE_KEY, JSON.stringify(settings))
+  } catch (error) {
+    logError('Failed to persist auto-refresh settings:', error)
+  }
+}
+
+const initialAutoRefresh = loadAutoRefreshSettings()
 
 // Backend Account Structure (matches Rust struct)
 interface BackendAccount {
@@ -101,8 +139,8 @@ export const usePlatformStore = create<PlatformStore>((set, get) => ({
   selectedPlatform: null,
   isLoading: false,
   error: null,
-  autoRefreshEnabled: true,
-  autoRefreshInterval: 5, // minutes
+  autoRefreshEnabled: initialAutoRefresh.enabled,
+  autoRefreshInterval: initialAutoRefresh.interval, // minutes
 
   loadAllAccounts: async () => {
     set({ isLoading: true, error: null })
@@ -313,7 +351,9 @@ export const usePlatformStore = create<PlatformStore>((set, get) => ({
   startAutoRefresh: () => {
     if (autoRefreshTimer) return
 
-    const { autoRefreshInterval } = get()
+    const { autoRefreshEnabled, autoRefreshInterval } = get()
+    if (!autoRefreshEnabled) return
+
     const intervalMs = autoRefreshInterval * 60 * 1000
 
     autoRefreshTimer = setInterval(() => {
@@ -349,10 +389,14 @@ export const usePlatformStore = create<PlatformStore>((set, get) => ({
   },
 
   setAutoRefresh: (enabled, interval) => {
+    const nextInterval = interval !== undefined ? interval : get().autoRefreshInterval
+
     set({
       autoRefreshEnabled: enabled,
-      autoRefreshInterval: interval !== undefined ? interval : get().autoRefreshInterval
+      autoRefreshInterval: nextInterval
     })
+
+    persistAutoRefreshSettings({ enabled, interval: nextInterval })
 
     if (enabled) {
       get().stopAutoRefresh()

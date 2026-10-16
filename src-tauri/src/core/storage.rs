@@ -288,6 +288,11 @@ pub fn get_current_storage_path(app: AppHandle) -> Result<String, String> {
     Ok(path.to_string_lossy().to_string())
 }
 
+/// 当前生效的存储文件路径（供备份 / 回滚等场景复用）
+pub fn current_storage_path(app: &AppHandle) -> Result<PathBuf, String> {
+    get_storage_path(app)
+}
+
 #[tauri::command]
 pub async fn select_storage_directory(app: AppHandle) -> Result<Option<String>, String> {
     use tauri_plugin_dialog::DialogExt;

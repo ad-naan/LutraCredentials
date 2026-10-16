@@ -2,6 +2,7 @@ use crate::core::{Account, Storage};
 use std::sync::Mutex;
 use tauri::{AppHandle, State};
 pub mod antigravity;
+pub mod backup;
 pub mod buddy;
 pub mod claude;
 pub mod codex;
@@ -11,6 +12,7 @@ pub mod github_copilot;
 pub mod grok;
 pub mod import;
 pub mod kiro;
+pub mod logs;
 pub mod machine;
 pub mod provider;
 pub mod qoder;
@@ -79,34 +81,4 @@ pub fn delete_account(app: AppHandle, state: State<AppState>, id: String) -> Res
     Ok(())
 }
 
-#[tauri::command]
-pub fn export_accounts(state: State<AppState>) -> Result<String, String> {
-    let storage = state.storage.lock().unwrap();
-    serde_json::to_string_pretty(&storage.accounts).map_err(|e| format!("Failed to export: {}", e))
-}
 
-#[tauri::command]
-pub fn import_accounts(
-    app: AppHandle,
-    state: State<AppState>,
-    json: String,
-) -> Result<Vec<Account>, String> {
-    let accounts: Vec<Account> =
-        serde_json::from_str(&json).map_err(|e| format!("Failed to parse import data: {}", e))?;
-
-    let mut storage = state.storage.lock().unwrap();
-    storage.accounts.extend(accounts.clone());
-    storage.save(&app)?;
-
-    Ok(accounts)
-}
-
-/// Get log file path
-#[tauri::command]
-pub fn get_log_file_path() -> Result<String, String> {
-    use crate::utils::logger::get_log_file_path;
-
-    get_log_file_path()
-        .map(|p| p.to_string_lossy().to_string())
-        .ok_or_else(|| "Log file not initialized".to_string())
-}

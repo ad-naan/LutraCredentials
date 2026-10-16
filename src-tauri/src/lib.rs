@@ -42,7 +42,7 @@ pub fn run() {
         }))
         .setup(|app| {
             // Initialize logger first
-            if let Err(e) = utils::logger::init_logger() {
+            if let Err(e) = utils::logger::init_logger(app.handle()) {
                 eprintln!("Failed to initialize logger: {}", e);
             }
 
@@ -206,9 +206,14 @@ pub fn run() {
             add_account,
             update_account,
             delete_account,
-            export_accounts,
-            import_accounts,
-            get_log_file_path,
+            // 备份 / 恢复
+            backup::backup_accounts,
+            backup::restore_accounts,
+            // 日志查询与维护
+            logs::read_log_tail,
+            logs::get_log_directory,
+            logs::open_log_directory,
+            logs::clear_log_file,
             core::storage::set_storage_path,
             core::storage::get_current_storage_path,
             core::storage::select_storage_directory,

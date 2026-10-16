@@ -45,8 +45,8 @@ const MAX_LOG_FILE_SIZE: u64 = 10 * 1024 * 1024;
 static LOG_FILE_PATH: Lazy<Mutex<Option<PathBuf>>> = Lazy::new(|| Mutex::new(None));
 
 /// 初始化日志系统
-pub fn init_logger() -> Result<(), String> {
-    let log_dir = get_log_dir()?;
+pub fn init_logger(app: &tauri::AppHandle) -> Result<(), String> {
+    let log_dir = get_log_dir(app)?;
 
     // 确保日志目录存在
     if !log_dir.exists() {
@@ -81,11 +81,14 @@ pub fn init_logger() -> Result<(), String> {
 }
 
 /// 获取日志目录
-fn get_log_dir() -> Result<PathBuf, String> {
-    let app_data =
-        dirs::data_dir().ok_or_else(|| "Failed to get app data directory".to_string())?;
+///
+/// 跟随应用标识符（com.lutra.credentials），不再硬编码旧品牌目录。
+fn get_log_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+    use tauri::Manager;
 
-    Ok(app_data.join("com.nexus.account-manager").join("logs"))
+    app.path()
+        .app_log_dir()
+        .map_err(|e| format!("Failed to get app log directory: {}", e))
 }
 
 /// 截断长字符串
