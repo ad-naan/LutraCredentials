@@ -84,8 +84,8 @@ export const kiroAccountOps: PlatformAccountOps = {
     }
   },
 
-  isExpiring(account) {
+  isExpiring(account, leadMs) {
     const kiro = account as KiroAccount
-    return KiroAccountService.isTokenExpiring(kiro) || KiroAccountService.isTokenExpired(kiro)
+    return KiroAccountService.isTokenExpiring(kiro, leadMs) || KiroAccountService.isTokenExpired(kiro)
   },
 }

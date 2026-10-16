@@ -14,4 +14,8 @@ export const antigravityAccountOps: PlatformAccountOps = {
     const patch = await AntigravityAccountService.refreshAccount(account as AntigravityAccount)
     return { success: true, patch }
   },
+
+  isExpiring(account, leadMs) {
+    return AntigravityAccountService.isTokenExpiring(account as AntigravityAccount, leadMs)
+  },
 }

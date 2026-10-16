@@ -14,13 +14,26 @@ function App() {
   const loadAllAccounts = usePlatformStore((state) => state.loadAllAccounts)
   const startAutoRefresh = usePlatformStore((state) => state.startAutoRefresh)
   const stopAutoRefresh = usePlatformStore((state) => state.stopAutoRefresh)
+  const checkAndRefreshExpiringTokens = usePlatformStore(
+    (state) => state.checkAndRefreshExpiringTokens,
+  )
 
   useEffect(() => {
-    // 应用启动时加载所有账户
-    loadAllAccounts().catch((error) => {
-      logError('Failed to load accounts on startup:', error)
-    })
-  }, [loadAllAccounts])
+    // 应用启动时加载所有账户，随后立即执行一次过期凭据检查：
+    // 否则启动时已临近过期的令牌要等到第一个定时周期才会被刷新。
+    let cancelled = false
+    loadAllAccounts()
+      .then(() => {
+        if (cancelled) return
+        void checkAndRefreshExpiringTokens()
+      })
+      .catch((error) => {
+        logError('Failed to load accounts on startup:', error)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [loadAllAccounts, checkAndRefreshExpiringTokens])
 
   useEffect(() => {
     // 启用后台凭据自动刷新（开关与间隔由设置页管理）

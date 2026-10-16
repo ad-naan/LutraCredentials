@@ -72,8 +72,14 @@ export interface PlatformAccountOps {
   refresh?: (account: Account) => Promise<AccountOpResult>
   /** 检测账号健康状况（是否封禁 / 状态 / 配额）。 */
   checkStatus?: (account: Account) => Promise<AccountOpResult>
-  /** 判断凭据是否即将过期，用于自动刷新调度。 */
-  isExpiring?: (account: Account) => boolean
+  /**
+   * 判断凭据是否即将过期，用于自动刷新调度。
+   *
+   * `leadMs` 为调度器传入的提前量（等于当前刷新间隔，最小 1 分钟）。
+   * 实现方应据此判断「是否会在下一次检查前失效」，避免刷新间隔大于
+   * 固定阈值时漏刷；不传时退回实现自带的默认阈值。
+   */
+  isExpiring?: (account: Account, leadMs?: number) => boolean
 }
 
 // ============================================================================

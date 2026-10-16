@@ -372,13 +372,17 @@ export const usePlatformStore = create<PlatformStore>((set, get) => ({
   },
 
   checkAndRefreshExpiringTokens: async () => {
-    const { accounts, autoRefreshEnabled } = get()
+    const { accounts, autoRefreshEnabled, autoRefreshInterval } = get()
     if (!autoRefreshEnabled) return
+
+    // 提前量取当前刷新间隔（最短 1 分钟）：保证「下一次检查前会过期」的令牌
+    // 一定被选中，而不是依赖各平台固定的 5 分钟阈值。
+    const leadMs = Math.max(autoRefreshInterval, MIN_AUTO_REFRESH_INTERVAL) * 60 * 1000
 
     const expiringIds = accounts
       .filter((acc) => {
         const ops = getAccountOps(acc.platform)
-        return Boolean(ops?.refresh && ops.isExpiring?.(acc))
+        return Boolean(ops?.refresh && ops.isExpiring?.(acc, leadMs))
       })
       .map((acc) => acc.id)
 

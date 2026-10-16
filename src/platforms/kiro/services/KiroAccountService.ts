@@ -345,13 +345,14 @@ export class KiroAccountService {
     }
 
     /**
-     * Check if token is expiring soon (within 5 minutes).
+     * 判断凭据是否即将过期。
+     *
+     * @param leadMs 提前量（毫秒）。自动刷新调度会传入当前刷新间隔，
+     *   确保「下一次检查前会过期」的令牌被提前刷新；默认 5 分钟。
      */
-    static isTokenExpiring(account: KiroAccount): boolean {
+    static isTokenExpiring(account: KiroAccount, leadMs = 5 * 60 * 1000): boolean {
         if (!account.credentials.expiresAt) return false
-        const now = Date.now()
-        const expiresIn = account.credentials.expiresAt - now
-        return expiresIn < 5 * 60 * 1000
+        return account.credentials.expiresAt - Date.now() <= leadMs
     }
 
     /**

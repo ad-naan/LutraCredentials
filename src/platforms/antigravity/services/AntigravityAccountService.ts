@@ -82,4 +82,16 @@ export class AntigravityAccountService {
       lastUsedAt: now,
     }
   }
+
+  /**
+   * 判断 access token 是否即将过期。
+   *
+   * 用于自动刷新调度：`leadMs` 由调度器按当前刷新间隔传入，
+   * 保证在下一次检查前会失效的令牌被提前刷新；默认 5 分钟。
+   */
+  static isTokenExpiring(account: AntigravityAccount, leadMs = 5 * 60 * 1000): boolean {
+    const expiry = account.token?.expiry_timestamp
+    if (!expiry) return false
+    return expiry - Date.now() <= leadMs
+  }
 }
