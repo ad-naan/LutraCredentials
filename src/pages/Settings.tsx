@@ -9,6 +9,7 @@ import { StorageService } from '@/services/StorageService'
 import { UpdateDialog } from '@/components/dialogs/UpdateDialog'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { LogViewer } from '@/components/common/LogViewer'
+import { ProxySettings } from '@/components/common/ProxySettings'
 import { usePlatformStore } from '@/stores/usePlatformStore'
 import { toast } from '@/lib/toast'
 import { invoke } from '@tauri-apps/api/core'
@@ -528,6 +529,8 @@ export function Settings() {
           </div>
         </CardContent>
       </Card>
+
+      <ProxySettings />
 
       <Card className="border-border bg-card shadow-sm">
         <CardHeader className="border-b border-border pb-4">

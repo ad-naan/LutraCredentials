@@ -459,5 +459,30 @@
         "topModels": "Top Models",
         "scanning": "Scanning sessions...",
         "noData": "No usage data yet"
+    },
+    "proxy": {
+        "title": "Local Routing Proxy",
+        "description": "Start a local HTTP proxy that forwards requests to configured upstream endpoints with failover and health checking.",
+        "start": "Start Proxy",
+        "stop": "Stop Proxy",
+        "healthCheck": "Health Check",
+        "configuration": "Proxy Configuration",
+        "port": "Listen Port",
+        "failover": "Failover",
+        "maxRetries": "Max Retries",
+        "upstreams": "Upstream Endpoints",
+        "addUpstream": "Add Upstream",
+        "noUpstreams": "No upstream endpoints configured. Click \"Add Upstream\" to begin.",
+        "name": "Name",
+        "namePlaceholder": "e.g. Official API",
+        "baseUrl": "Base URL",
+        "apiKey": "API Key",
+        "priority": "Priority",
+        "timeout": "Timeout (ms)",
+        "healthy": "Healthy",
+        "unhealthy": "Unhealthy",
+        "totalRequests": "Total Requests",
+        "failedRequests": "Failed Requests",
+        "upstreams": "Upstreams"
     }
 }

@@ -15,6 +15,7 @@ pub mod kiro;
 pub mod logs;
 pub mod machine;
 pub mod provider;
+pub mod proxy_cmd;
 pub mod qoder;
 pub mod speedtest;
 pub mod state_db;

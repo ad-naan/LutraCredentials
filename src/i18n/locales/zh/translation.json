@@ -458,5 +458,30 @@
         "topModels": "常用模型",
         "scanning": "正在扫描会话...",
         "noData": "暂无用量数据"
+    },
+    "proxy": {
+        "title": "本地路由代理",
+        "description": "在本地启动 HTTP 代理，将请求转发到配置的上游端点，支持故障转移和健康检查。",
+        "start": "启动代理",
+        "stop": "停止代理",
+        "healthCheck": "健康检查",
+        "configuration": "代理配置",
+        "port": "监听端口",
+        "failover": "故障转移",
+        "maxRetries": "最大重试",
+        "upstreams": "上游端点",
+        "addUpstream": "添加上游",
+        "noUpstreams": "尚未配置上游端点，点击「添加上游」开始。",
+        "name": "名称",
+        "namePlaceholder": "例如：官方 API",
+        "baseUrl": "基础 URL",
+        "apiKey": "API Key",
+        "priority": "优先级",
+        "timeout": "超时(ms)",
+        "healthy": "健康",
+        "unhealthy": "异常",
+        "totalRequests": "总请求",
+        "failedRequests": "失败请求",
+        "upstreams": "上游数"
     }
 }
