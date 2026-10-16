@@ -22,6 +22,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { geminiProviderService } from '../services/ProviderService'
+import { EndpointSpeedTest } from '@/components/common/EndpointSpeedTest'
 import { toast } from 'sonner'
 import { ExternalLink, Loader2 } from 'lucide-react'
 
@@ -34,6 +35,7 @@ interface ProviderSelectorProps {
 export function ProviderSelector({ open, onOpenChange, onSuccess }: ProviderSelectorProps) {
   const [selectedPreset, setSelectedPreset] = useState<GeminiProviderPreset | null>(null)
   const [apiKey, setApiKey] = useState('')
+  const [selectedBaseUrl, setSelectedBaseUrl] = useState<string | undefined>(undefined)
   const [isApplying, setIsApplying] = useState(false)
 
   const groupedPresets = {
@@ -46,6 +48,7 @@ export function ProviderSelector({ open, onOpenChange, onSuccess }: ProviderSele
     const preset = geminiProviderPresets.find((p) => p.id === presetId)
     setSelectedPreset(preset || null)
     setApiKey('')
+    setSelectedBaseUrl(preset?.config.env.GOOGLE_GEMINI_BASE_URL)
   }
 
   const handleApply = async () => {
@@ -61,7 +64,7 @@ export function ProviderSelector({ open, onOpenChange, onSuccess }: ProviderSele
 
     setIsApplying(true)
     try {
-      await geminiProviderService.applyProvider(selectedPreset, apiKey.trim())
+      await geminiProviderService.applyProvider(selectedPreset, apiKey.trim(), selectedBaseUrl)
       toast.success('Provider 配置已应用', {
         description: '请重启 Gemini CLI 使配置生效',
       })
@@ -157,13 +160,21 @@ export function ProviderSelector({ open, onOpenChange, onSuccess }: ProviderSele
                 <p className="text-sm text-muted-foreground">{selectedPreset.description}</p>
               )}
 
-              {selectedPreset.config.env.GOOGLE_GEMINI_BASE_URL && (
-                <div className="rounded-md bg-muted p-3 text-sm">
-                  <div className="font-medium">Base URL</div>
-                  <div className="text-muted-foreground">
-                    {selectedPreset.config.env.GOOGLE_GEMINI_BASE_URL}
+              {selectedPreset.endpointCandidates && selectedPreset.endpointCandidates.length > 0 ? (
+                <EndpointSpeedTest
+                  endpoints={selectedPreset.endpointCandidates}
+                  selectedUrl={selectedBaseUrl}
+                  onSelect={setSelectedBaseUrl}
+                />
+              ) : (
+                selectedPreset.config.env.GOOGLE_GEMINI_BASE_URL && (
+                  <div className="rounded-md bg-muted p-3 text-sm">
+                    <div className="font-medium">Base URL</div>
+                    <div className="text-muted-foreground">
+                      {selectedBaseUrl ?? selectedPreset.config.env.GOOGLE_GEMINI_BASE_URL}
+                    </div>
                   </div>
-                </div>
+                )
               )}
             </>
           )}

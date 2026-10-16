@@ -8,13 +8,18 @@ export class ClaudeProviderService {
    * 读取当前 ~/.claude/settings.json，保留用户已有的顶层配置（permissions 等），
    * 仅整体替换 `env` 块（避免残留上一个供应商的 BASE_URL）。
    */
-  async applyProvider(preset: ClaudeProviderPreset, apiKey: string): Promise<void> {
+  async applyProvider(
+    preset: ClaudeProviderPreset,
+    apiKey: string,
+    baseUrl?: string
+  ): Promise<void> {
     const current = await invoke<Record<string, unknown>>('get_claude_config')
 
     const config: ClaudeEnvConfig & Record<string, unknown> = {
       ...current,
       env: {
         ...preset.config.env,
+        ...(baseUrl ? { ANTHROPIC_BASE_URL: baseUrl } : {}),
         ANTHROPIC_AUTH_TOKEN: apiKey,
       },
     }

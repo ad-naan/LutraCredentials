@@ -16,6 +16,7 @@ pub mod logs;
 pub mod machine;
 pub mod provider;
 pub mod qoder;
+pub mod speedtest;
 pub mod state_db;
 pub mod trae;
 pub mod updater;
