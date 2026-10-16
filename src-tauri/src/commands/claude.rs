@@ -1,3 +1,4 @@
+use crate::core::claude_oauth;
 use crate::utils::logger::log_info;
 use serde_json::{json, Value};
 use std::env;
@@ -21,6 +22,15 @@ fn get_claude_config_path() -> Result<PathBuf, String> {
 
     let config_path = home_dir.join(".claude").join("settings.json");
     Ok(config_path)
+}
+
+/// Claude 配置目录（~/.claude 或 CLAUDE_CONFIG_PATH 所在目录）
+fn get_claude_config_dir() -> Result<PathBuf, String> {
+    let config_path = get_claude_config_path()?;
+    Ok(config_path
+        .parent()
+        .map(|p| p.to_path_buf())
+        .unwrap_or(config_path))
 }
 
 /// Atomic write helper
@@ -237,4 +247,93 @@ fn extract_version(raw: &str) -> String {
         .find(raw)
         .map(|m| m.as_str().to_string())
         .unwrap_or_else(|| raw.to_string())
+}
+
+// =============================
+// Claude 官方 OAuth（订阅账号）
+// =============================
+
+/// 生成 OAuth 授权链接（含 PKCE 会话信息）
+#[tauri::command]
+pub fn claude_oauth_start() -> claude_oauth::OAuthSession {
+    log_info("[Claude OAuth] Authorization URL generated");
+    claude_oauth::build_authorize_url()
+}
+
+/// 用授权码换取 token，并附带账号资料
+#[tauri::command]
+pub async fn claude_oauth_exchange(
+    code: String,
+    state: String,
+    code_verifier: String,
+) -> Result<Value, String> {
+    let tokens = claude_oauth::exchange_code(code.trim(), &state, &code_verifier).await?;
+    let profile = claude_oauth::fetch_profile(&tokens.access_token)
+        .await
+        .unwrap_or(claude_oauth::OAuthProfile {
+            email: None,
+            name: None,
+            account_uuid: None,
+        });
+
+    log_info("[Claude OAuth] Login completed");
+
+    Ok(json!({
+        "tokens": tokens,
+        "profile": profile,
+    }))
+}
+
+/// 刷新 OAuth token
+#[tauri::command]
+pub async fn claude_oauth_refresh(refresh_token: String) -> Result<claude_oauth::OAuthTokens, String> {
+    claude_oauth::refresh_tokens(refresh_token.trim()).await
+}
+
+/// 查询订阅用量（5 小时 / 7 天窗口）
+#[tauri::command]
+pub async fn claude_oauth_usage(access_token: String) -> Result<claude_oauth::OAuthUsage, String> {
+    claude_oauth::fetch_usage(access_token.trim()).await
+}
+
+/// 切换到 OAuth 账号：写 .credentials.json 并清理 settings.json 的 API Key 环境变量
+#[tauri::command]
+pub async fn claude_oauth_switch(credentials: String) -> Result<(), String> {
+    log_info("[Claude OAuth] Switching to OAuth account...");
+
+    let tokens: claude_oauth::OAuthTokens = serde_json::from_str(&credentials)
+        .map_err(|e| format!("Failed to parse OAuth credentials: {}", e))?;
+
+    let config_dir = get_claude_config_dir()?;
+
+    if !config_dir.exists() {
+        fs::create_dir_all(&config_dir)
+            .map_err(|e| format!("Failed to create .claude directory: {}", e))?;
+    }
+
+    // 1. 写入 .credentials.json
+    let credentials_path = config_dir.join(".credentials.json");
+    let credentials_str = serde_json::to_string_pretty(&claude_oauth::build_credentials_file(&tokens))
+        .map_err(|e| format!("Failed to serialize credentials: {}", e))?;
+    write_atomic(&credentials_path, &credentials_str)?;
+
+    // 2. 清理 settings.json 中会覆盖 OAuth 的 env 变量
+    let settings_path = get_claude_config_path()?;
+    if settings_path.exists() {
+        if let Ok(content) = fs::read_to_string(&settings_path) {
+            if let Ok(mut settings) = serde_json::from_str::<Value>(&content) {
+                claude_oauth::sanitize_settings_env(&mut settings);
+                let sanitized = serde_json::to_string_pretty(&settings)
+                    .map_err(|e| format!("Failed to serialize settings: {}", e))?;
+                write_atomic(&settings_path, &sanitized)?;
+            }
+        }
+    }
+
+    log_info(&format!(
+        "[Claude OAuth] Credentials written to {}",
+        credentials_path.display()
+    ));
+
+    Ok(())
 }

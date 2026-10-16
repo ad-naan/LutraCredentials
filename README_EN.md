@@ -33,9 +33,9 @@
 [![Rust](https://img.shields.io/badge/Rust-1.70+-orange?style=flat-square&logo=rust)](https://www.rust-lang.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 
-[![Windows](https://img.shields.io/badge/Windows-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/adnaan-worker/nexus-account-manager/releases)
-[![macOS](https://img.shields.io/badge/macOS-000000?style=flat-square&logo=apple&logoColor=white)](https://github.com/adnaan-worker/nexus-account-manager/releases)
-[![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black)](https://github.com/adnaan-worker/nexus-account-manager/releases)
+[![Windows](https://img.shields.io/badge/Windows-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/ad-naan/nexus-account-manager/releases)
+[![macOS](https://img.shields.io/badge/macOS-000000?style=flat-square&logo=apple&logoColor=white)](https://github.com/ad-naan/nexus-account-manager/releases)
+[![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black)](https://github.com/ad-naan/nexus-account-manager/releases)
 
 </div>
 
@@ -447,7 +447,7 @@ graph TB
 
 <div align="center">
 
-Visit the [Releases page](https://github.com/adnaan-worker/nexus-account-manager/releases) to download the installer for your system:
+Visit the [Releases page](https://github.com/ad-naan/nexus-account-manager/releases) to download the installer for your system:
 
 | Platform | File Format | Notes |
 |:---:|:---:|:---|
@@ -848,8 +848,8 @@ Thanks to these wonderful people who have contributed to this project:
 <table>
   <tr>
     <td align="center">
-      <a href="https://github.com/adnaan-worker">
-        <img src="https://github.com/adnaan-worker.png" width="100px;" alt="adnaan"/>
+      <a href="https://github.com/ad-naan">
+        <img src="https://github.com/ad-naan.png" width="100px;" alt="adnaan"/>
         <br />
         <sub><b>adnaan</b></sub>
       </a>
@@ -866,7 +866,7 @@ Thanks to these wonderful people who have contributed to this project:
       <sub>Contributor</sub>
     </td>
     <td align="center">
-      <a href="https://github.com/adnaan-worker/nexus-account-manager/graphs/contributors">
+      <a href="https://github.com/ad-naan/nexus-account-manager/graphs/contributors">
         <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/users.svg" width="100px;" alt="More Contributors"/>
         <br />
         <sub><b>More Contributors</b></sub>
@@ -968,8 +968,8 @@ This project stands on the shoulders of giants:
 
 <p>
   <a href="#nexus-account-manager">⬆ Back to Top</a> •
-  <a href="https://github.com/adnaan-worker/nexus-account-manager/issues">Report Issues</a> •
-  <a href="https://github.com/adnaan-worker/nexus-account-manager/discussions">Discussions</a>
+  <a href="https://github.com/ad-naan/nexus-account-manager/issues">Report Issues</a> •
+  <a href="https://github.com/ad-naan/nexus-account-manager/discussions">Discussions</a>
 </p>
 
 <p>

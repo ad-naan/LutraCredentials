@@ -68,7 +68,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://github.com/adnaan-worker/nexus-account-manager/releases/latest/download/updater.json"
+        "https://github.com/ad-naan/nexus-account-manager/releases/latest/download/updater.json"
       ],
       "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDRGQURCRkVENjNFNjdDNDMKUldSRGZPWmo3Yit0VHczbFlIVWlXU3pYQmtTV25aM1UvM2E3OW1NSlNXdjJsckYrUEc1Znl2Mk0K"

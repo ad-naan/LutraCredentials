@@ -83,6 +83,19 @@
             "verifying": "Verifying...",
             "verifySuccess": "API key is valid",
             "verifyFailed": "API key verification failed",
+            "oauth": {
+                "title": "Official OAuth Login",
+                "description": "Log in with your Claude subscription account (Pro/Max). After authorizing, paste the code shown on the redirect page.",
+                "openPage": "Open Authorization Page",
+                "codeLabel": "Authorization Code",
+                "complete": "Complete Login"
+            },
+            "usage": {
+                "refresh": "Refresh Usage",
+                "refreshing": "Refreshing...",
+                "refreshed": "Usage refreshed",
+                "refreshFailed": "Failed to refresh usage"
+            },
             "errors": {
                 "noApiKey": "API Key not found in account config",
                 "switchFailed": "Failed to switch account"
@@ -90,7 +103,22 @@
         },
         "codex": {
             "name": "OpenAI Codex",
-            "description": "Manage your OpenAI Codex API accounts"
+            "description": "Manage your OpenAI Codex API accounts",
+            "oauth": {
+                "title": "ChatGPT OAuth Login",
+                "description": "Log in with your ChatGPT account (Plus/Pro/Team). Enter the code below on the verification page and authorize.",
+                "start": "Start Login",
+                "userCode": "Verification code",
+                "waiting": "Waiting for authorization...",
+                "exchanging": "Exchanging token...",
+                "openPage": "Open Verification Page"
+            },
+            "usage": {
+                "check": "Check Subscription",
+                "checking": "Checking...",
+                "refreshed": "Subscription refreshed",
+                "refreshFailed": "Failed to refresh subscription"
+            }
         },
         "gemini": {
             "name": "Google Gemini",

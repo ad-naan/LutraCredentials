@@ -273,9 +273,12 @@ pub struct KiroQuotaData {
 pub async fn get_usage_limits(access_token: &str) -> Result<KiroQuotaData, String> {
     use crate::utils::logger::{log_info, log_warn};
 
-    // 主端点和备用端点
-    let primary_url = "https://codewhisperer.us-east-1.amazonaws.com/getUsageLimits";
-    let fallback_url = "https://us-east-1.codewhisperer.aws.amazon.com/getUsageLimits";
+    // 新版 Kiro 桌面客户端使用 q.<region>.amazonaws.com；旧端点作为回退
+    let candidate_urls = [
+        "https://q.us-east-1.amazonaws.com/getUsageLimits",
+        "https://codewhisperer.us-east-1.amazonaws.com/getUsageLimits",
+        "https://us-east-1.codewhisperer.aws.amazon.com/getUsageLimits",
+    ];
 
     let client = get_client();
 
@@ -285,76 +288,37 @@ pub async fn get_usage_limits(access_token: &str) -> Result<KiroQuotaData, Strin
         ("isEmailRequired", "true"),
     ];
 
-    // 尝试主端点
-    log_info(&format!(
-        "[Kiro] Fetching usage limits from primary endpoint: {}",
-        primary_url
-    ));
-    let res_result = client
-        .get(primary_url)
-        .query(&params)
-        .header("Authorization", format!("Bearer {}", access_token))
-        .header("Accept", "application/json")
-        .header("User-Agent", CLI_USER_AGENT)
-        .header("x-amz-user-agent", CLI_USER_AGENT)
-        .send()
-        .await;
+    // 依次尝试候选端点，返回第一个成功的响应
+    let mut res = None;
+    for url in candidate_urls {
+        log_info(&format!("[Kiro] Fetching usage limits from: {}", url));
+        let result = client
+            .get(url)
+            .query(&params)
+            .header("Authorization", format!("Bearer {}", access_token))
+            .header("Accept", "application/json")
+            .header("User-Agent", CLI_USER_AGENT)
+            .header("x-amz-user-agent", CLI_USER_AGENT)
+            .send()
+            .await;
 
-    // 如果主端点失败（网络错误或 403），尝试备用端点
-    let res = match res_result {
-        Ok(response) => {
-            let status = response.status();
-            log_info(&format!(
-                "[Kiro] Primary endpoint response status: {}",
-                status
-            ));
-
-            if status == 403 {
-                log_warn(&format!(
-                    "[Kiro] Primary endpoint returned 403, trying fallback: {}",
-                    fallback_url
-                ));
-                client
-                    .get(fallback_url)
-                    .query(&params)
-                    .header("Authorization", format!("Bearer {}", access_token))
-                    .header("Accept", "application/json")
-                    .header("User-Agent", CLI_USER_AGENT)
-                    .header("x-amz-user-agent", CLI_USER_AGENT)
-                    .send()
-                    .await
-                    .map_err(|e| e.to_string())?
-            } else {
-                response
+        match result {
+            Ok(response) if response.status().is_success() => {
+                res = Some(response);
+                break;
+            }
+            Ok(response) => {
+                let status = response.status();
+                let text = response.text().await.unwrap_or_default();
+                log_warn(&format!("[Kiro] Endpoint {} failed: {} - {}", url, status, text));
+            }
+            Err(e) => {
+                log_warn(&format!("[Kiro] Endpoint {} request error: {}", url, e));
             }
         }
-        Err(e) => {
-            log_warn(&format!(
-                "[Kiro] Primary endpoint failed with error: {}, trying fallback: {}",
-                e, fallback_url
-            ));
-            client
-                .get(fallback_url)
-                .query(&params)
-                .header("Authorization", format!("Bearer {}", access_token))
-                .header("Accept", "application/json")
-                .header("User-Agent", CLI_USER_AGENT)
-                .header("x-amz-user-agent", CLI_USER_AGENT)
-                .send()
-                .await
-                .map_err(|e| e.to_string())?
-        }
-    };
-
-    if !res.status().is_success() {
-        let status = res.status();
-        let error_text = res.text().await.unwrap_or_default();
-        log_warn(&format!(
-            "[Kiro] Usage API failed: {} - {}",
-            status, error_text
-        ));
-        return Err(format!("Usage API failed: {}", status));
     }
+
+    let res = res.ok_or_else(|| "Usage API failed: all endpoints unavailable".to_string())?;
 
     let json: serde_json::Value = res.json().await.map_err(|e| e.to_string())?;
 

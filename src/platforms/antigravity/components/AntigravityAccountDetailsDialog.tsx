@@ -30,6 +30,24 @@ export function AntigravityAccountDetailsDialog({ account, open, onClose }: Anti
   const isForbidden = account.is_forbidden || account.quota?.is_forbidden
 
   const sections = [
+    // 周期用量桶（5h / weekly）
+    !!(account.quota?.usage_buckets && account.quota.usage_buckets.length > 0) && {
+      title: 'Usage Windows',
+      icon: <Clock className="h-4 w-4" />,
+      content: (
+        <div className="space-y-1.5 p-4 bg-muted/30 rounded-lg border border-border/50">
+          {account.quota!.usage_buckets!.map((bucket) => (
+            <QuotaItem
+              key={bucket.id}
+              label={bucket.display_name || bucket.id}
+              percentage={bucket.percentage}
+              resetTime={bucket.reset_time}
+            />
+          ))}
+        </div>
+      )
+    },
+
     // 配额模型
     account.quota && {
       title: 'Model Quotas',

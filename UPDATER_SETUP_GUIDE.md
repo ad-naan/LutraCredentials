@@ -31,7 +31,7 @@ Public key: dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6...
 
 ### 2.1 访问 GitHub Secrets 页面
 
-打开：https://github.com/adnaan-worker/nexus-account-manager/settings/secrets/actions
+打开：https://github.com/ad-naan/nexus-account-manager/settings/secrets/actions
 
 ### 2.2 添加第一个 Secret
 
@@ -114,12 +114,12 @@ git push origin v1.0.2
 
 ### 5.3 等待构建
 
-- 访问：https://github.com/adnaan-worker/nexus-account-manager/actions
+- 访问：https://github.com/ad-naan/nexus-account-manager/actions
 - 等待 "Release" 工作流完成（约 10-20 分钟）
 
 ### 5.4 发布 Release
 
-- 访问：https://github.com/adnaan-worker/nexus-account-manager/releases
+- 访问：https://github.com/ad-naan/nexus-account-manager/releases
 - 找到自动创建的 Draft Release
 - 检查是否包含 `updater.json` 文件
 - 点击 **"Publish release"**

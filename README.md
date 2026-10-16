@@ -128,7 +128,7 @@ Nexus Account Manager
 - 包管理器：npm / pnpm / yarn
 编译命令
 # 克隆项目仓库
-git clone https://github.com/adnaan-worker/nexus-account-manager.git
+git clone https://github.com/ad-naan/nexus-account-manager.git
 cd nexus-account-manager
 
 # 安装前端依赖

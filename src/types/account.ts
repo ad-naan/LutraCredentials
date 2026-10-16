@@ -44,8 +44,16 @@ export interface ModelQuota {
   reset_time: string
 }
 
+export interface UsageBucket {
+  id: string
+  display_name?: string
+  percentage: number
+  reset_time: string
+}
+
 export interface AntigravityQuotaData {
   models: ModelQuota[]
+  usage_buckets?: UsageBucket[]
   last_updated: number
   is_forbidden: boolean
   subscription_tier?: 'FREE' | 'PRO' | 'ULTRA'
@@ -141,10 +149,30 @@ export interface ClaudeEnvConfig {
   }
 }
 
+/** Claude 官方 OAuth 凭据 */
+export interface ClaudeOAuthData {
+  access_token: string
+  refresh_token: string
+  /** 毫秒时间戳 */
+  expires_at: number
+  scopes?: string[]
+}
+
+/** Claude 订阅用量（5 小时 / 7 天窗口） */
+export interface ClaudeUsage {
+  five_hour_percentage?: number
+  five_hour_reset_time?: string
+  seven_day_percentage?: number
+  seven_day_reset_time?: string
+}
+
 export interface ClaudeAccount extends BaseAccount {
   platform: 'claude'
   providerId?: string
-  config: ClaudeEnvConfig
+  /** 官方 OAuth（订阅账号）；与 API Key 导入互斥 */
+  oauth?: ClaudeOAuthData
+  usage?: ClaudeUsage
+  config?: ClaudeEnvConfig
 }
 
 // --- Codex Specifics ---
@@ -176,10 +204,26 @@ export interface CodexConfig {
   [key: string]: any
 }
 
+/** Codex (ChatGPT) 官方 OAuth 凭据 */
+export interface CodexOAuthData {
+  id_token: string
+  access_token: string
+  refresh_token: string
+  account_id?: string
+}
+
+/** Codex 订阅状态 */
+export interface CodexUsage {
+  plan?: string
+}
+
 export interface CodexAccount extends BaseAccount {
   platform: 'codex'
   providerId?: string
-  config: CodexConfig
+  /** 官方 OAuth（ChatGPT 订阅账号）；与 API Key 导入互斥 */
+  oauth?: CodexOAuthData
+  usage?: CodexUsage
+  config?: CodexConfig
 }
 
 // --- Gemini Specifics ---

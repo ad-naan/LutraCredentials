@@ -63,7 +63,35 @@ export function ClaudeAccountList() {
     setIsSwitching(true)
     
     try {
-      // 1. 调用 Rust 后端切换账户配置（包含回填逻辑）
+      if (claudeAccount.oauth) {
+        // 官方 OAuth 账号：先刷新 token，再写入 .credentials.json
+        let oauth = claudeAccount.oauth
+        try {
+          const refreshed = await invoke<ClaudeAccount['oauth']>('claude_oauth_refresh', {
+            refreshToken: oauth.refresh_token,
+          })
+          if (refreshed?.access_token) {
+            oauth = { ...oauth, ...refreshed }
+          }
+        } catch (e) {
+          // 刷新失败时沿用现有凭据继续切换
+          logError('Failed to refresh Claude OAuth token:', e)
+        }
+
+        await invoke('claude_oauth_switch', { credentials: JSON.stringify(oauth) })
+
+        await Promise.all(
+          claudeAccounts
+            .filter((acc) => acc.id !== account.id && acc.isActive)
+            .map((acc) => updateAccount(acc.id, { isActive: false })),
+        )
+        await updateAccount(account.id, { oauth, isActive: true, lastUsedAt: Date.now() })
+
+        toast.success(t('claude.switchSuccess', 'Account switched successfully'))
+        return
+      }
+
+      // API Key / 中转站账号：写 settings.json env
       const config = claudeAccount.config
 
       if (!config) {
@@ -73,14 +101,14 @@ export function ClaudeAccountList() {
       
       await invoke('switch_claude_account', { settings: JSON.stringify(config) })
       
-      // 2. 将其他账户设置为非激活状态
+      // 将其他账户设置为非激活状态
       const updatePromises = claudeAccounts
         .filter(acc => acc.id !== account.id && acc.isActive)
         .map(acc => updateAccount(acc.id, { isActive: false }))
       
       await Promise.all(updatePromises)
       
-      // 3. 更新当前账户为激活状态
+      // 更新当前账户为激活状态
       await updateAccount(account.id, { 
         isActive: true,
         lastUsedAt: Date.now()
@@ -212,7 +240,7 @@ export function ClaudeAccountList() {
                   account={account}
                   onSwitch={() => setSwitchAccount(account)}
                   onExport={() => setExportOpen(true)}
-                  onEdit={() => setEdit(account)}
+                  onEdit={account.oauth ? undefined : () => setEdit(account)}
                 />
               ))}
             </div>

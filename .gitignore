@@ -22,8 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-/Antigravity-Manager-main
-/Kiro-account-manager
-/config
-/cc-switch-main
-/cockpit-tools-main
+/same-other
+.adnify/

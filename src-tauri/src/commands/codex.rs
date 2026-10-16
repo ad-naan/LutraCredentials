@@ -198,6 +198,69 @@ pub async fn switch_codex_account(app: AppHandle, settings: Option<String>) -> R
     Ok(())
 }
 
+// =============================
+// Codex 官方 OAuth（ChatGPT 订阅账号）
+// =============================
+
+/// 启动设备授权，返回 user_code 与验证页链接
+#[tauri::command]
+pub async fn codex_oauth_start() -> Result<crate::core::codex_oauth::DeviceAuthSession, String> {
+    let session = crate::core::codex_oauth::start_device_auth().await?;
+    log_info("[Codex OAuth] Device authorization started");
+    Ok(session)
+}
+
+/// 轮询设备授权状态（前端按 interval 调用）
+#[tauri::command]
+pub async fn codex_oauth_poll(
+    device_auth_id: String,
+    user_code: String,
+) -> Result<crate::core::codex_oauth::DevicePollStatus, String> {
+    crate::core::codex_oauth::poll_device_token(&device_auth_id, &user_code).await
+}
+
+/// 用授权码完成登录
+#[tauri::command]
+pub async fn codex_oauth_complete(
+    authorization_code: String,
+    code_verifier: String,
+) -> Result<crate::core::codex_oauth::OAuthTokens, String> {
+    crate::core::codex_oauth::exchange_code(authorization_code.trim(), code_verifier.trim()).await
+}
+
+/// 刷新 OAuth token
+#[tauri::command]
+pub async fn codex_oauth_refresh(
+    refresh_token: String,
+    id_token: Option<String>,
+) -> Result<crate::core::codex_oauth::OAuthTokens, String> {
+    crate::core::codex_oauth::refresh_tokens(refresh_token.trim(), id_token.as_deref()).await
+}
+
+/// 查询账号订阅状态
+#[tauri::command]
+pub async fn codex_check_quota(
+    access_token: String,
+    account_id: Option<String>,
+) -> Result<crate::core::codex_oauth::AccountCheck, String> {
+    crate::core::codex_oauth::check_account(access_token.trim(), account_id.as_deref()).await
+}
+
+/// 切换到 OAuth 账号：以托管格式写 auth.json（不改动 config.toml）
+#[tauri::command]
+pub async fn codex_oauth_switch(app: AppHandle, credentials: String) -> Result<(), String> {
+    log_info("[Codex OAuth] Switching to OAuth account...");
+
+    let tokens: crate::core::codex_oauth::OAuthTokens = serde_json::from_str(&credentials)
+        .map_err(|e| format!("Failed to parse OAuth credentials: {}", e))?;
+
+    let auth = crate::core::codex_oauth::build_managed_auth_json(&tokens);
+    write_auth_json(&app, &auth)?;
+
+    log_info("[Codex OAuth] auth.json written (managed chatgpt mode)");
+    Ok(())
+}
+
 /// Get current Codex configuration
 #[tauri::command]
 pub async fn get_codex_config(app: AppHandle) -> Result<Value, String> {

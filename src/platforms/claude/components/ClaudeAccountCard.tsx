@@ -1,14 +1,15 @@
 import { memo, useState } from 'react'
 import { AccountCard } from '@/components/accounts/AccountCardBase'
+import { QuotaItem } from '@/components/accounts/QuotaItem'
 import { Badge } from '@/components/ui/badge'
 import { ClaudeAccountDetailsDialog } from './ClaudeAccountDetailsDialog'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { toast } from '@/lib/toast'
-import { Edit, CheckCircle } from 'lucide-react'
+import { Edit, CheckCircle, BarChart3 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { usePlatformStore } from '@/stores/usePlatformStore'
 import { invoke } from '@tauri-apps/api/core'
-import type { ClaudeAccount } from '@/types/account'
+import type { ClaudeAccount, ClaudeUsage } from '@/types/account'
 
 interface ClaudeAccountCardProps {
   account: ClaudeAccount
@@ -28,7 +29,10 @@ export const ClaudeAccountCard = memo(function ClaudeAccountCard({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
   const deleteAccount = usePlatformStore(state => state.deleteAccount)
+  const updateAccount = usePlatformStore(state => state.updateAccount)
   const setActiveAccount = usePlatformStore(state => state.setActiveAccount)
+
+  const isOAuth = !!account.oauth
 
   const handleSwitch = () => {
     setActiveAccount(account)
@@ -48,7 +52,7 @@ export const ClaudeAccountCard = memo(function ClaudeAccountCard({
   const handleVerify = async () => {
     try {
       setIsVerifying(true)
-      
+
       // 从账户配置中获取 API Key
       const apiKey = account.config?.env.ANTHROPIC_API_KEY || account.config?.env.ANTHROPIC_AUTH_TOKEN
       if (!apiKey) {
@@ -74,6 +78,40 @@ export const ClaudeAccountCard = memo(function ClaudeAccountCard({
     }
   }
 
+  // OAuth 账号：刷新 token 并更新订阅用量
+  const handleRefreshUsage = async () => {
+    if (!account.oauth) return
+
+    try {
+      setIsVerifying(true)
+
+      let oauth = account.oauth
+      try {
+        const refreshed = await invoke<ClaudeAccount['oauth']>('claude_oauth_refresh', {
+          refreshToken: oauth.refresh_token,
+        })
+        if (refreshed?.access_token) {
+          oauth = { ...oauth, ...refreshed }
+        }
+      } catch (e) {
+        // token 刷新失败时用现有凭据尝试查询
+      }
+
+      const usage = await invoke<ClaudeUsage>('claude_oauth_usage', {
+        accessToken: oauth.access_token,
+      })
+      await updateAccount(account.id, { oauth, usage })
+
+      toast.success(t('platforms.claude.usage.refreshed', 'Usage refreshed'))
+    } catch (e: any) {
+      toast.error(t('platforms.claude.usage.refreshFailed', 'Failed to refresh usage'), e.message || t('common.unknownError'))
+    } finally {
+      setIsVerifying(false)
+    }
+  }
+
+  const usage = account.usage
+
   return (
     <>
       <AccountCard
@@ -82,9 +120,36 @@ export const ClaudeAccountCard = memo(function ClaudeAccountCard({
         name={account.name}
         isActive={account.isActive}
         badges={
-          <Badge variant="outline" className="text-[10px] h-5 px-2 text-muted-foreground">
-            Claude
-          </Badge>
+          <>
+            <Badge variant="outline" className="text-[10px] h-5 px-2 text-muted-foreground">
+              Claude
+            </Badge>
+            {isOAuth && (
+              <Badge variant="outline" className="text-[10px] h-5 px-2 text-primary border-primary/40">
+                OAuth
+              </Badge>
+            )}
+          </>
+        }
+        content={
+          isOAuth && usage && (
+            <div className="flex flex-wrap gap-1.5">
+              {usage.five_hour_percentage !== undefined && (
+                <QuotaItem
+                  label="5h"
+                  percentage={usage.five_hour_percentage}
+                  resetTime={usage.five_hour_reset_time}
+                />
+              )}
+              {usage.seven_day_percentage !== undefined && (
+                <QuotaItem
+                  label="7d"
+                  percentage={usage.seven_day_percentage}
+                  resetTime={usage.seven_day_reset_time}
+                />
+              )}
+            </div>
+          )
         }
         onSwitch={handleSwitch}
         onExport={onExport}
@@ -96,13 +161,21 @@ export const ClaudeAccountCard = memo(function ClaudeAccountCard({
             label: t('common.edit'),
             onClick: onEdit
           }] : []),
-          {
-            icon: CheckCircle,
-            label: isVerifying ? t('platforms.claude.verifying') : t('platforms.claude.verify'),
-            onClick: handleVerify,
-            loading: isVerifying,
-            disabled: isVerifying
-          }
+          isOAuth
+            ? {
+                icon: BarChart3,
+                label: isVerifying ? t('platforms.claude.usage.refreshing', 'Refreshing...') : t('platforms.claude.usage.refresh', 'Refresh Usage'),
+                onClick: handleRefreshUsage,
+                loading: isVerifying,
+                disabled: isVerifying
+              }
+            : {
+                icon: CheckCircle,
+                label: isVerifying ? t('platforms.claude.verifying') : t('platforms.claude.verify'),
+                onClick: handleVerify,
+                loading: isVerifying,
+                disabled: isVerifying
+              }
         ]}
       />
 

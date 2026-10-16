@@ -83,6 +83,19 @@
             "verifying": "验证中...",
             "verifySuccess": "API Key 有效",
             "verifyFailed": "API Key 验证失败",
+            "oauth": {
+                "title": "官方 OAuth 登录",
+                "description": "使用 Claude 订阅账号（Pro/Max）登录。授权完成后，将跳转页面展示的授权码粘贴回来。",
+                "openPage": "打开授权页面",
+                "codeLabel": "授权码",
+                "complete": "完成登录"
+            },
+            "usage": {
+                "refresh": "刷新用量",
+                "refreshing": "刷新中...",
+                "refreshed": "用量已更新",
+                "refreshFailed": "刷新用量失败"
+            },
             "errors": {
                 "noApiKey": "账号配置中未找到 API Key",
                 "switchFailed": "切换账号失败"
@@ -90,7 +103,22 @@
         },
         "codex": {
             "name": "OpenAI Codex",
-            "description": "管理您的 OpenAI Codex API 账号"
+            "description": "管理您的 OpenAI Codex API 账号",
+            "oauth": {
+                "title": "ChatGPT OAuth 登录",
+                "description": "使用 ChatGPT 账号（Plus/Pro/Team）登录。在验证页面输入下方代码并完成授权，登录将自动完成。",
+                "start": "开始登录",
+                "userCode": "验证代码",
+                "waiting": "等待授权完成...",
+                "exchanging": "正在换取令牌...",
+                "openPage": "打开验证页面"
+            },
+            "usage": {
+                "check": "查询订阅",
+                "checking": "查询中...",
+                "refreshed": "订阅状态已更新",
+                "refreshFailed": "查询订阅失败"
+            }
         },
         "gemini": {
             "name": "Google Gemini",
