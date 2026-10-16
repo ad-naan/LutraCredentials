@@ -1,4 +1,4 @@
-﻿import { logError } from '@/lib/logger'
+import { logError } from '@/lib/logger'
 import { memo, useState } from 'react'
 import { AccountCard } from '@/components/accounts/AccountCardBase'
 import { Badge } from '@/components/ui/badge'
@@ -41,8 +41,8 @@ export const KiroAccountCard = memo(function KiroAccountCard({
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const deleteAccount = usePlatformStore(state => state.deleteAccount)
-  const refreshKiroToken = usePlatformStore(state => state.refreshKiroToken)
-  const switchKiroAccount = usePlatformStore(state => state.switchKiroAccount)
+  const refreshAccount = usePlatformStore(state => state.refreshAccount)
+  const switchAccount = usePlatformStore(state => state.switchAccount)
 
   const subscriptionType = account.subscription?.type || 'Free'
   const usagePercent = (account.usage?.percentUsed || 0) * 100
@@ -52,7 +52,7 @@ export const KiroAccountCard = memo(function KiroAccountCard({
   const handleRefresh = async () => {
     setIsRefreshing(true)
     try {
-      const success = await refreshKiroToken(account.id)
+      const success = await refreshAccount(account.id)
       if (success) {
         toast.success(t('accounts.refreshSuccess'), account.email)
       } else {
@@ -69,7 +69,7 @@ export const KiroAccountCard = memo(function KiroAccountCard({
   const handleSwitch = async () => {
     setIsSwitching(true)
     try {
-      await switchKiroAccount(account.id)
+      await switchAccount(account.id)
       toast.success(t('accounts.switchSuccess'), account.email)
     } catch (e: any) {
       logError('Failed to switch account:', e)

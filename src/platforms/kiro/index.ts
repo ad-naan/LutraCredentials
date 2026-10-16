@@ -3,6 +3,7 @@ import { Fingerprint, Users, Key } from 'lucide-react'
 import { kiroIcon } from '@/platforms/icons'
 import { KiroAccountList } from './components/AccountList'
 import { BuilderIdMethod, SocialMethod, TokenImportMethod } from './methods'
+import { kiroAccountOps } from './accountOps'
 
 export const kiroConfig: PlatformConfig = {
   id: 'kiro',
@@ -18,6 +19,8 @@ export const kiroConfig: PlatformConfig = {
     autoRefresh: true,
     quota: true,
   },
+
+  accountOps: kiroAccountOps,
 
   addMethods: [
     {

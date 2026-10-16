@@ -1,10 +1,10 @@
 # AI 编程永久规则（强制执行）
 
-> 本文档定义了 Nexus Account Manager 项目的 AI 编程规则，所有 AI 辅助开发必须严格遵守。
+> 本文档定义了 **LutraCredentials**（原名 Nexus Account Manager）项目的 AI 编程规则，所有 AI 辅助开发必须严格遵守。
 
 ## 📋 项目概述
 
-- **项目名称**: Nexus Account Manager
+- **项目名称**: LutraCredentials
 - **技术栈**: Tauri 2 + React 19 + TypeScript + Rust
 - **架构模式**: 插件化平台架构
 - **状态管理**: Zustand
@@ -13,23 +13,24 @@
 
 ---
 
-## 一、项目结构（严格只读）
+## 一、项目结构（约定优先，结构性调整需授权）
 
-以下目录结构为 **强制规范**，禁止修改、移动、删除或新增未声明的顶层目录：
+以下目录结构为项目的**约定基线**。日常开发请在既有目录内新增 / 修改文件；
+如需跨目录的结构性重构（新增顶层目录、调整架构分层），必须先取得用户明确授权，并在同一批次内同步更新本文件。
 
 ```
-nexus-account-manager/
+lutra-credentials/
 ├── src/                          # React 前端源码
 │   ├── components/               # 组件目录
 │   │   ├── ui/                  # 基础 UI 组件（Radix UI + shadcn/ui）
-│   │   ├── layout/              # 布局组件
-│   │   ├── common/              # 通用组件（如 ThemeManager）
+│   │   ├── layout/              # 布局组件（MainLayout / TopNav）
+│   │   ├── common/              # 通用组件（ThemeManager / ErrorBoundary）
 │   │   ├── accounts/            # 账户相关通用组件
 │   │   │   ├── AccountCardBase.tsx          # 账户卡片基础组件
 │   │   │   ├── AccountDetailsDialogBase.tsx # 详情对话框基础组件
 │   │   │   ├── AccountSearch.tsx            # 账户搜索组件
-│   │   │   └── AccountTable.tsx             # 账户表格组件
-│   │   ├── dashboard/           # 仪表盘组件
+│   │   │   ├── AccountTable.tsx             # 账户表格组件
+│   │   │   └── AddMethodSelector.tsx        # 添加方式选择器
 │   │   └── dialogs/             # 对话框组件
 │   │
 │   ├── platforms/               # 平台模块（插件化架构核心）
@@ -44,30 +45,37 @@ nexus-account-manager/
 │   │   │   ├── components/
 │   │   │   ├── methods/
 │   │   │   ├── services/       # 平台服务层
+│   │   │   ├── accountOps.ts   # 平台账号操作契约实现
 │   │   │   └── index.ts
+│   │   ├── external/            # 命令式外部平台定义（12 个外部平台）
+│   │   │   └── index.tsx
+│   │   ├── shared/              # 外部平台共享渲染器
+│   │   │   └── externalPlatform.tsx
+│   │   ├── accountOps.ts        # 账号操作叶子注册表（打破循环依赖）
+│   │   ├── icons.tsx            # 平台图标
 │   │   └── registry.ts          # 平台注册中心（所有平台必须在此注册）
 │   │
 │   ├── pages/                   # 页面组件
 │   │   ├── Dashboard.tsx        # 仪表盘页面
 │   │   ├── Accounts.tsx         # 账户管理页面
+│   │   ├── MachineId.tsx        # 机器码管理页面
 │   │   └── Settings.tsx         # 设置页面
 │   │
 │   ├── services/                # 服务层
-│   │   ├── base/               # 基础服务类
-│   │   │   ├── BaseAccountService.ts
-│   │   │   └── BaseOAuthService.ts
 │   │   ├── MachineIdService.ts
-│   │   └── ServiceFactory.ts
+│   │   └── StorageService.ts
 │   │
 │   ├── stores/                  # Zustand 状态管理
 │   │   └── usePlatformStore.ts
 │   │
 │   ├── hooks/                   # 自定义 React Hooks
-│   │   └── useTheme.ts
+│   │   ├── useTheme.ts
+│   │   └── usePlatformVersions.ts
 │   │
 │   ├── types/                   # TypeScript 类型定义
 │   │   ├── account.ts
-│   │   └── platform.ts
+│   │   ├── platform.ts          # 含 PlatformAccountOps 账号操作契约
+│   │   └── provider.ts          # Provider 预设类型
 │   │
 │   ├── i18n/                    # 国际化配置
 │   │   ├── config.ts
@@ -80,6 +88,9 @@ nexus-account-manager/
 │   │   ├── logger.ts           # 统一日志系统
 │   │   └── toast.ts            # Toast 通知工具
 │   │
+│   ├── styles/                  # 设计令牌与工作台样式
+│   │   ├── tokens.css
+│   │   └── workbench.css
 │   ├── assets/                  # 静态资源
 │   ├── App.tsx                  # 应用根组件
 │   ├── main.tsx                 # 应用入口
@@ -175,7 +186,7 @@ nexus-account-manager/
 - "顺手重构" **无关代码**
 - 擅自抽象或创建 **新的设计模式**
 - 跨目录 **复制粘贴代码**
-- 修改 **核心架构**（如插件系统、状态管理）
+- 修改 **核心架构**（如插件系统、状态管理）——如需调整必须取得用户明确授权，并在本批次同步更新本文档
 - **重复实现**：相同功能在多处重复实现，应提取为公共工具
 
 ### 2.3 平台开发规则
@@ -193,18 +204,40 @@ src/platforms/[platform-name]/
 │   ├── index.ts                           # 必需：导出所有认证方法
 │   └── [MethodName]Method.tsx             # 认证方法组件
 ├── services/                               # 可选：平台特定服务
+├── services/                               # 可选：平台特定服务（必须无副作用，只返回 patch）
 │   └── [Platform]Service.ts
+├── accountOps.ts                           # 可选：平台账号操作契约实现
 └── index.ts                                # 必需：平台配置导出
 ```
 
 **平台配置必须包含**：
 - `id`: 唯一标识符
 - `name`: 显示名称
-- `icon`: Lucide React 图标
+- `icon`: 平台图标（`PlatformIconComponent`）
 - `color`: 主题色
 - `description`: 描述
 - `AccountList`: 账户列表组件
 - `features`: 功能特性配置
+- `accountOps`（可选）: 声明本平台支持的「切号 / 刷新 / 状态检测」能力，见下节
+
+### 2.4 账号操作契约（accountOps）
+
+平台能力必须通过 `PlatformConfig.accountOps` 声明，**禁止**把单一平台的切号 / 刷新逻辑写进全局 store。
+
+```typescript
+export interface PlatformAccountOps {
+  switchAccount?: (account: Account) => Promise<Partial<Account> | void>
+  refresh?: (account: Account) => Promise<AccountOpResult>
+  checkStatus?: (account: Account) => Promise<AccountOpResult>
+  isExpiring?: (account: Account) => boolean
+}
+```
+
+- 契约实现放在 `src/platforms/[platform]/accountOps.ts`，在平台 `index.ts` 中挂到 `accountOps` 字段；
+- `registry.ts` 会把各平台契约登记到叶子注册表 `src/platforms/accountOps.ts`，`usePlatformStore` 的
+  `switchAccount / refreshAccount / checkAccountStatus / batchRefreshAccounts` 会自动调度对应平台；
+- 外部平台（`platforms/external`）由 `createExternalAccountOps` 根据 `switchCommand / refreshCommand` 自动生成契约。
+
 
 ### 2.3.1 账户卡片组件规范
 

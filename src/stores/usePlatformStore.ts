@@ -2,7 +2,7 @@ import { logError, logInfo } from '@/lib/logger'
 import { create } from 'zustand'
 import { invoke } from '@tauri-apps/api/core'
 import { Account, KiroAccount } from '@/types/account'
-import { KiroAccountService } from '@/platforms/kiro/services/KiroAccountService'
+import { getAccountOps } from '@/platforms/accountOps'
 
 // Auto-refresh timer
 let autoRefreshTimer: ReturnType<typeof setInterval> | null = null
@@ -42,11 +42,14 @@ interface PlatformStore {
   setSelectedPlatform: (platform: string | null) => void
   getAccountsByPlatform: (platform: string) => Account[]
   
-  // Kiro-specific operations
-  switchKiroAccount: (id: string) => Promise<void>
-  refreshKiroToken: (id: string) => Promise<boolean>
-  checkKiroStatus: (id: string) => Promise<void>
-  batchRefreshKiroTokens: (ids: string[]) => Promise<void>
+  // 通用账号操作（由各平台 accountOps 契约驱动，不再硬编码单一平台）
+  switchAccount: (id: string) => Promise<void>
+  refreshAccount: (id: string) => Promise<boolean>
+  checkAccountStatus: (id: string) => Promise<void>
+  batchRefreshAccounts: (ids: string[]) => Promise<void>
+  batchCheckAccountStatus: (ids: string[]) => Promise<void>
+  canSwitch: (platform: string) => boolean
+  canRefresh: (platform: string) => boolean
   
   // Auto-refresh management
   startAutoRefresh: () => void
@@ -187,198 +190,122 @@ export const usePlatformStore = create<PlatformStore>((set, get) => ({
     return get().accounts.filter((acc) => acc.platform === platform)
   },
 
-  // ==================== Kiro-specific operations ====================
+  // ==================== 通用账号操作（accountOps 驱动） ====================
 
-  switchKiroAccount: async (id) => {
-    const accounts = get().accounts
-    const targetAccount = accounts.find(a => a.id === id) as KiroAccount | undefined
-    if (!targetAccount || targetAccount.platform !== 'kiro') {
-      throw new Error('Account not found or not a Kiro account')
+  canSwitch: (platform) => Boolean(getAccountOps(platform)?.switchAccount),
+
+  canRefresh: (platform) => Boolean(getAccountOps(platform)?.refresh),
+
+  switchAccount: async (id) => {
+    const account = get().accounts.find((a) => a.id === id)
+    if (!account) throw new Error('Account not found')
+
+    const ops = getAccountOps(account.platform)
+    if (!ops?.switchAccount) {
+      throw new Error(`${account.platform} 平台不支持一键切号`)
     }
 
-    const result = await KiroAccountService.switchAccount(targetAccount)
-    const activeKiroAccounts = accounts.filter(
-      acc => acc.platform === 'kiro' && acc.id !== id && acc.isActive
-    )
+    const patch = (await ops.switchAccount(account)) || {}
 
-    for (const acc of activeKiroAccounts) {
-      await get().updateAccount(acc.id, { isActive: false })
+    // 同一平台仅保留一个活跃账号
+    const siblings = get().accounts.filter(
+      (a) => a.platform === account.platform && a.id !== id && a.isActive,
+    )
+    for (const sibling of siblings) {
+      await get().updateAccount(sibling.id, { isActive: false })
     }
 
     await get().updateAccount(id, {
       isActive: true,
-      lastUsedAt: result.lastUsedAt,
-      credentials: result.credentials
-    } as Partial<KiroAccount>)
+      lastUsedAt: Date.now(),
+      ...patch,
+    } as Partial<Account>)
 
-    const activeAccount = get().accounts.find(acc => acc.id === id) || null
-    set({ activeAccount })
+    set({ activeAccount: get().accounts.find((a) => a.id === id) || null })
   },
 
-  refreshKiroToken: async (id) => {
-    const account = get().accounts.find(a => a.id === id) as KiroAccount | undefined
-    if (!account || account.platform !== 'kiro') return false
+  refreshAccount: async (id) => {
+    const account = get().accounts.find((a) => a.id === id)
+    if (!account) return false
 
-    // Update status to refreshing
+    const ops = getAccountOps(account.platform)
+    if (!ops?.refresh) return false
+
     set((state) => ({
       accounts: state.accounts.map((acc) =>
-        acc.id === id && acc.platform === 'kiro'
-          ? { ...acc, status: 'refreshing' as const }
-          : acc
-      )
+        acc.id === id ? ({ ...acc, status: 'refreshing' } as Account) : acc,
+      ),
     }))
 
     try {
-      const result = await KiroAccountService.refreshToken(account)
-      const checkedAt = Date.now()
-
-      if (result.success && result.updatedAccount) {
-        const updated: Partial<KiroAccount> = {
-          ...result.updatedAccount,
-          status: 'active',
-          lastError: undefined,
-          lastCheckedAt: checkedAt
-        }
-
-        await get().updateAccount(id, updated)
-        return true
-      } else {
-        // Update with error status
-        await get().updateAccount(id, {
-          status: 'error',
-          lastError: result.error,
-          lastCheckedAt: checkedAt
-        } as Partial<KiroAccount>)
-        return false
+      const result = await ops.refresh(account)
+      const patch: Record<string, unknown> = { ...(result.patch || {}) }
+      if (!result.success && !patch.status) {
+        patch.status = 'error'
+        patch.lastError = result.error
+        patch.lastCheckedAt = Date.now()
       }
+      await get().updateAccount(id, patch as Partial<Account>)
+      return result.success
     } catch (error) {
       await get().updateAccount(id, {
         status: 'error',
         lastError: error instanceof Error ? error.message : 'Unknown error',
-        lastCheckedAt: Date.now()
-      } as Partial<KiroAccount>)
+        lastCheckedAt: Date.now(),
+      } as Partial<Account>)
       return false
     }
   },
 
-  checkKiroStatus: async (id) => {
-    const account = get().accounts.find(a => a.id === id) as KiroAccount | undefined
-    if (!account || account.platform !== 'kiro') return
+  checkAccountStatus: async (id) => {
+    const account = get().accounts.find((a) => a.id === id)
+    if (!account) return
 
-    // Update status to refreshing (visual feedback)
+    const ops = getAccountOps(account.platform)
+    if (!ops?.checkStatus) return
+
     set((state) => ({
       accounts: state.accounts.map((acc) =>
-        acc.id === id && acc.platform === 'kiro'
-          ? { ...acc, status: 'refreshing' as const }
-          : acc
-      )
+        acc.id === id ? ({ ...acc, status: 'refreshing' } as Account) : acc,
+      ),
     }))
 
     try {
-      const result = await KiroAccountService.checkStatus(account)
-
-      if (result.success) {
-        const updated: Partial<KiroAccount> = {
-          status: result.status || 'active',
-          usage: result.usage || account.usage,
-          subscription: result.subscription || account.subscription,
-          email: result.email || account.email,
-          userId: result.userId || account.userId,
-          lastCheckedAt: Date.now(),
-          lastError: undefined
-        }
-
-        // If credentials were refreshed, update them
-        if (result.newCredentials) {
-          updated.credentials = {
-            ...account.credentials,
-            accessToken: result.newCredentials.accessToken,
-            refreshToken: result.newCredentials.refreshToken || account.credentials.refreshToken,
-            expiresAt: result.newCredentials.expiresAt
-          }
-        }
-
-        await get().updateAccount(id, updated)
-      } else {
-        await get().updateAccount(id, {
-          status: result.isBanned ? 'banned' : 'error',
-          lastError: result.error,
-          lastCheckedAt: Date.now()
-        } as Partial<KiroAccount>)
+      const result = await ops.checkStatus(account)
+      const patch: Record<string, unknown> = { ...(result.patch || {}) }
+      if (!result.success && !patch.status) {
+        patch.status = 'error'
+        patch.lastError = result.error
+        patch.lastCheckedAt = Date.now()
       }
+      await get().updateAccount(id, patch as Partial<Account>)
     } catch (error) {
       await get().updateAccount(id, {
         status: 'error',
         lastError: error instanceof Error ? error.message : 'Unknown error',
-        lastCheckedAt: Date.now()
-      } as Partial<KiroAccount>)
+        lastCheckedAt: Date.now(),
+      } as Partial<Account>)
     }
   },
 
-  batchRefreshKiroTokens: async (ids) => {
-    const kiroAccounts = ids
-      .map(id => get().accounts.find(a => a.id === id))
-      .filter((acc): acc is KiroAccount => {
-        if (!acc || acc.platform !== 'kiro') {
-          return false
-        }
-        const kiroAccount = acc as KiroAccount
-        return Boolean(kiroAccount.credentials?.refreshToken)
-      })
+  batchRefreshAccounts: async (ids) => {
+    const targets = ids
+      .map((id) => get().accounts.find((a) => a.id === id))
+      .filter((acc): acc is Account => Boolean(acc && getAccountOps(acc.platform)?.refresh))
 
-    if (kiroAccounts.length === 0) return
+    if (targets.length === 0) return
 
-    logInfo(`[BatchRefresh] Refreshing ${kiroAccounts.length} Kiro accounts...`)
+    logInfo(`[BatchRefresh] 刷新 ${targets.length} 个账号...`)
+    await Promise.all(targets.map((account) => get().refreshAccount(account.id)))
+    logInfo('[BatchRefresh] 已完成')
+  },
 
-    // Update all to refreshing status
-    set((state) => ({
-      accounts: state.accounts.map((acc) =>
-        ids.includes(acc.id) && acc.platform === 'kiro'
-          ? { ...acc, status: 'refreshing' as const }
-          : acc
-      )
-    }))
+  batchCheckAccountStatus: async (ids) => {
+    const targets = ids
+      .map((id) => get().accounts.find((a) => a.id === id))
+      .filter((acc): acc is Account => Boolean(acc && getAccountOps(acc.platform)?.checkStatus))
 
-    // Prepare accounts for batch refresh
-    const accountsToRefresh = kiroAccounts.map(acc => ({
-      id: acc.id,
-      email: acc.email,
-      credentials: acc.credentials
-    }))
-
-    try {
-      const result = await KiroAccountService.batchRefresh(accountsToRefresh, 10)
-
-      // Update each account based on result
-      for (const item of result.results) {
-        if (item.success && item.data?.accessToken) {
-          const account = kiroAccounts.find(a => a.id === item.id)
-          if (account) {
-            await get().updateAccount(item.id, {
-              credentials: {
-                ...account.credentials,
-                accessToken: item.data.accessToken,
-                refreshToken: item.data.refreshToken || account.credentials.refreshToken,
-                expiresAt: Date.now() + (item.data.expiresIn || 3600) * 1000
-              },
-              status: 'active',
-              lastError: undefined,
-              lastCheckedAt: Date.now()
-            } as Partial<KiroAccount>)
-          }
-        } else {
-          await get().updateAccount(item.id, {
-            status: 'error',
-            lastError: item.error,
-            lastCheckedAt: Date.now()
-          } as Partial<KiroAccount>)
-        }
-      }
-
-      logInfo(`[BatchRefresh] Completed: ${result.successCount} success, ${result.failedCount} failed`)
-    } catch (error) {
-      logError('[BatchRefresh] Error:', error)
-    }
+    await Promise.all(targets.map((account) => get().checkAccountStatus(account.id)))
   },
 
   // ==================== Auto-refresh management ====================
@@ -408,14 +335,16 @@ export const usePlatformStore = create<PlatformStore>((set, get) => ({
     const { accounts, autoRefreshEnabled } = get()
     if (!autoRefreshEnabled) return
 
-    const kiroAccounts = accounts.filter((acc): acc is KiroAccount => acc.platform === 'kiro')
-    const expiringAccounts = kiroAccounts.filter(acc =>
-      KiroAccountService.isTokenExpiring(acc) || KiroAccountService.isTokenExpired(acc)
-    )
+    const expiringIds = accounts
+      .filter((acc) => {
+        const ops = getAccountOps(acc.platform)
+        return Boolean(ops?.refresh && ops.isExpiring?.(acc))
+      })
+      .map((acc) => acc.id)
 
-    if (expiringAccounts.length > 0) {
-      logInfo(`[AutoRefresh] Found ${expiringAccounts.length} expiring tokens`)
-      await get().batchRefreshKiroTokens(expiringAccounts.map(a => a.id))
+    if (expiringIds.length > 0) {
+      logInfo(`[AutoRefresh] Found ${expiringIds.length} expiring accounts`)
+      await get().batchRefreshAccounts(expiringIds)
     }
   },
 

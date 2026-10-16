@@ -9,7 +9,6 @@ import { cn, getSubscriptionDisplayName, getSubscriptionStyle } from '@/lib/util
 import { toast } from '@/lib/toast'
 import { useTranslation } from 'react-i18next'
 import { usePlatformStore } from '@/stores/usePlatformStore'
-import { AntigravityAccountService } from '../services/AntigravityAccountService'
 import type { AntigravityAccount } from '@/types/account'
 import { Ban, Gem, Diamond, Circle } from 'lucide-react'
 
@@ -34,6 +33,8 @@ export const AntigravityAccountCard = memo(function AntigravityAccountCard({
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const deleteAccount = usePlatformStore(state => state.deleteAccount)
+  const refreshAccount = usePlatformStore(state => state.refreshAccount)
+  const switchAccount = usePlatformStore(state => state.switchAccount)
 
   const subscriptionTier = account.quota?.subscription_tier || 'FREE'
   const isForbidden = account.is_forbidden || account.quota?.is_forbidden
@@ -41,8 +42,12 @@ export const AntigravityAccountCard = memo(function AntigravityAccountCard({
   const handleRefresh = async () => {
     setIsRefreshing(true)
     try {
-      await AntigravityAccountService.refreshAccount(account)
-      toast.success(t('accounts.refreshSuccess'), account.email)
+      const success = await refreshAccount(account.id)
+      if (success) {
+        toast.success(t('accounts.refreshSuccess'), account.email)
+      } else {
+        toast.error(t('accounts.refreshFailed'), t('common.unknownError'))
+      }
     } catch (e: any) {
       logError('Failed to refresh:', e)
       toast.error(t('accounts.refreshFailed'), e.message || t('common.unknownError'))
@@ -53,7 +58,7 @@ export const AntigravityAccountCard = memo(function AntigravityAccountCard({
 
   const handleSwitch = async () => {
     try {
-      await AntigravityAccountService.switchAccount(account.id)
+      await switchAccount(account.id)
       toast.success(t('accounts.switchSuccess'), account.email)
     } catch (e: any) {
       logError('Failed to switch account:', e)

@@ -3,6 +3,7 @@ import { Globe, Key, Database } from 'lucide-react'
 import { antigravityIcon } from '@/platforms/icons'
 import { AntigravityAccountList } from './components/AccountList'
 import { OAuthMethod, TokenMethod, ImportMethod } from './methods'
+import { antigravityAccountOps } from './accountOps'
 
 export const antigravityConfig: PlatformConfig = {
   id: 'antigravity',
@@ -19,6 +20,8 @@ export const antigravityConfig: PlatformConfig = {
     proxy: true,
     autoRefresh: true,
   },
+
+  accountOps: antigravityAccountOps,
 
   addMethods: [
     {

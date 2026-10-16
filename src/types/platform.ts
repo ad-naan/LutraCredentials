@@ -43,6 +43,40 @@ export interface AccountAction {
 }
 
 // ============================================================================
+// 平台账号操作契约（accountOps）
+// ============================================================================
+
+/**
+ * 单个账号操作的返回结果。
+ * - success：操作是否成功
+ * - error：失败原因（用于写入账号 lastError）
+ * - patch：需要合并回账号并持久化的字段（如刷新后的 credentials / usage / status）
+ */
+export interface AccountOpResult {
+  success: boolean
+  error?: string
+  patch?: Partial<Account>
+}
+
+/**
+ * 平台账号操作契约。
+ *
+ * 平台通过实现这些**可选**方法，声明自己支持哪些「一键切号 / 刷新 / 状态检测」能力，
+ * 由 usePlatformStore 统一调度，从而彻底移除全局 store 中的平台硬编码。
+ * 未实现的平台在调用对应能力时会被明确拒绝（而不是静默失败）。
+ */
+export interface PlatformAccountOps {
+  /** 在该主机上激活此账号（写 Token / SSO 缓存 / 数据库等）；返回需要持久化的补丁。 */
+  switchAccount?: (account: Account) => Promise<Partial<Account> | void>
+  /** 刷新凭据（Token）与配额。 */
+  refresh?: (account: Account) => Promise<AccountOpResult>
+  /** 检测账号健康状况（是否封禁 / 状态 / 配额）。 */
+  checkStatus?: (account: Account) => Promise<AccountOpResult>
+  /** 判断凭据是否即将过期，用于自动刷新调度。 */
+  isExpiring?: (account: Account) => boolean
+}
+
+// ============================================================================
 // 平台配置
 // ============================================================================
 
@@ -75,6 +109,9 @@ export interface PlatformConfig {
 
   // 特性标志
   features: PlatformFeatures
+
+  // 账号操作契约（切号 / 刷新 / 状态检测），由 store 统一调度
+  accountOps?: PlatformAccountOps
 
   // 添加方式配置
   addMethods: AddMethodConfig[]

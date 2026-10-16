@@ -47,7 +47,12 @@ import { usePlatformVersions } from '@/hooks/usePlatformVersions'
 import { cn } from '@/lib/utils'
 import { usePlatformStore } from '@/stores/usePlatformStore'
 import type { GenericAccount } from '@/types/account'
-import type { AddMethodConfig, AddMethodProps, PlatformConfig } from '@/types/platform'
+import type {
+  AddMethodConfig,
+  AddMethodProps,
+  PlatformAccountOps,
+  PlatformConfig,
+} from '@/types/platform'
 
 type ViewMode = 'grid' | 'list'
 type Status = 'idle' | 'waiting' | 'processing' | 'success' | 'error'
@@ -1299,6 +1304,8 @@ function ExternalPlatformAccountList({ definition }: { definition: ExternalPlatf
   const { t } = useTranslation()
   const accounts = usePlatformStore((state) => state.accounts)
   const updateAccount = usePlatformStore((state) => state.updateAccount)
+  const switchAccount = usePlatformStore((state) => state.switchAccount)
+  const refreshAccount = usePlatformStore((state) => state.refreshAccount)
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [searchQuery, setSearchQuery] = useState('')
   const [exportOpen, setExportOpen] = useState(false)
@@ -1335,24 +1342,12 @@ function ExternalPlatformAccountList({ definition }: { definition: ExternalPlatf
     Boolean(actionLoadingMap[buildActionKey(accountId, actionId)])
 
   const handleSwitchAccount = async (account: GenericAccount) => {
-    if (!definition.switchCommand || isSwitching) return
-    if (!account.config) {
-      toast.error(`${definition.name} configuration not found`)
-      return
-    }
+    if (!canSwitchAccounts || isSwitching) return
 
     setIsSwitching(true)
 
     try {
-      await invoke(definition.switchCommand, { settings: JSON.stringify(account.config) })
-
-      await Promise.all(
-        platformAccounts
-          .filter((item) => item.id !== account.id && item.isActive)
-          .map((item) => updateAccount(item.id, { isActive: false })),
-      )
-      await updateAccount(account.id, { isActive: true, lastUsedAt: Date.now() })
-
+      await switchAccount(account.id)
       toast.success(`${definition.name} account switched successfully`)
     } catch (error) {
       toast.error(
@@ -1364,23 +1359,18 @@ function ExternalPlatformAccountList({ definition }: { definition: ExternalPlatf
   }
 
   const handleRefreshAccount = async (account: GenericAccount) => {
-    if (!definition.refreshCommand || !account.config) {
-      toast.error(`${definition.name} configuration not found`)
-      return
-    }
+    if (!canRefreshAccounts) return
 
     const actionKey = buildActionKey(account.id, 'refresh')
     setActionLoadingMap((current) => ({ ...current, [actionKey]: true }))
 
     try {
-      const nextConfig = ensureObjectConfig(
-        await invoke(definition.refreshCommand, {
-          settings: JSON.stringify(account.config),
-        }),
-      )
-
-      await updateAccount(account.id, buildExternalAccountPatch(account, nextConfig))
-      toast.success(`${definition.name} account refreshed`)
+      const success = await refreshAccount(account.id)
+      if (success) {
+        toast.success(`${definition.name} account refreshed`)
+      } else {
+        toast.error(`Failed to refresh ${definition.name} account`)
+      }
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : `Failed to refresh ${definition.name} account`,
@@ -1649,6 +1639,46 @@ function ExternalPlatformAccountList({ definition }: { definition: ExternalPlatf
   )
 }
 
+/**
+ * 把外部平台声明的 switchCommand / refreshCommand 适配为统一的账号操作契约，
+ * 使外部平台与内置平台共用 store 的 switchAccount / refreshAccount 调度。
+ */
+export function createExternalAccountOps(
+  definition: ExternalPlatformDefinition,
+): PlatformAccountOps {
+  const ops: PlatformAccountOps = {}
+
+  if (definition.switchCommand) {
+    ops.switchAccount = async (account) => {
+      const generic = account as GenericAccount
+      if (!generic.config) {
+        throw new Error(`${definition.name} configuration not found`)
+      }
+      await invoke(definition.switchCommand as string, {
+        settings: JSON.stringify(generic.config),
+      })
+      return { lastUsedAt: Date.now() }
+    }
+  }
+
+  if (definition.refreshCommand) {
+    ops.refresh = async (account) => {
+      const generic = account as GenericAccount
+      if (!generic.config) {
+        return { success: false, error: `${definition.name} configuration not found` }
+      }
+      const nextConfig = ensureObjectConfig(
+        await invoke(definition.refreshCommand as string, {
+          settings: JSON.stringify(generic.config),
+        }),
+      )
+      return { success: true, patch: buildExternalAccountPatch(generic, nextConfig) }
+    }
+  }
+
+  return ops
+}
+
 export function createExternalPlatformConfig(
   definition: ExternalPlatformDefinition,
 ): PlatformConfig {
@@ -1666,6 +1696,7 @@ export function createExternalPlatformConfig(
       autoRefresh: false,
       machineId: false,
     },
+    accountOps: createExternalAccountOps(definition),
     addMethods: createExternalAddMethods(definition),
   }
 }
