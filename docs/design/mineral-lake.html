@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LutraCredentials · 岩灰湖绿设计稿</title>
+  <link rel="stylesheet" href="/src/styles/tokens.css" />
+  <link rel="stylesheet" href="/src/styles/workbench.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--workbench-font); color: hsl(var(--foreground)); background: hsl(var(--background)); }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; color: inherit; background: transparent; }
+    button:focus-visible, a:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 3px; }
+    p { margin: 0; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .board-toolbar { display: flex; height: 44px; align-items: center; gap: 6px; padding: 0 16px; border-bottom: 1px solid hsl(var(--border)); background: hsl(var(--card)); }
+    .board-toolbar strong { margin-right: 14px; font-size: 12px; }
+    .board-tab { padding: 5px 10px; border: 1px solid transparent; border-radius: 6px; color: hsl(var(--muted-foreground)); font-size: 11px; }
+    .board-tab[aria-selected=true] { color: hsl(var(--primary)); background: hsl(var(--accent)); border-color: hsl(var(--primary) / .15); }
+    .board-note { margin-left: auto; font-size: 10px; color: hsl(var(--muted-foreground)); }
+    .app-shell { height: calc(100dvh - 44px); min-height: 500px; }
+    .board-view[hidden] { display: none !important; }
+    .board-view { width: 100%; }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 34px; padding: 6px 12px; border: 1px solid hsl(var(--border)); border-radius: 7px; font-size: 12px; font-weight: 500; text-decoration: none; background: hsl(var(--card)); }
+    .button-primary { border-color: transparent; color: hsl(var(--primary-foreground)); background: hsl(var(--primary)); }
+    .button-ghost { border: 0; background: transparent; }
+    .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-button { display: inline-flex; height: 28px; width: 28px; align-items: center; justify-content: center; border: 0; border-radius: 6px; color: hsl(var(--muted-foreground)); }
+    .icon-button:hover { background: hsl(var(--accent)); color: hsl(var(--primary)); }
+    .account-email { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .account-identity { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+    .account-name { margin-top: 4px; color: hsl(var(--muted-foreground)); font-size: 11px; }
+    .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 5px; color: hsl(var(--muted-foreground)); background: hsl(var(--secondary)); font-size: 10px; white-space: nowrap; }
+    .pill-active { color: hsl(var(--primary)); background: hsl(var(--accent)); }
+    .pill-warning { color: hsl(var(--warning)); background: hsl(var(--warning) / .1); }
+    .account-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .quota-label { display: flex; align-items: center; justify-content: space-between; color: hsl(var(--muted-foreground)); font-size: 11px; }
+    .quota-track { height: 4px; margin-top: 7px; border-radius: 6px; background: hsl(var(--muted)); }
+    .quota-track span { display: block; height: 100%; border-radius: inherit; background: hsl(var(--primary)); }
+    .account-updated { margin-top: 10px; color: hsl(var(--muted-foreground)); font-size: 10px; }
+    .search-field { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 10px; border: 1px solid hsl(var(--input)); border-radius: 7px; background: hsl(var(--card)); color: hsl(var(--muted-foreground)); font-size: 12px; }
+    .search-field input { width: 100%; border: 0; outline: 0; background: transparent; color: inherit; font-size: inherit; }
+    .demo-modal-layer { position: fixed; inset: 76px 0 0; display: flex; align-items: center; justify-content: center; padding: 24px; background: hsl(174 25% 9% / .42); backdrop-filter: blur(3px); z-index: 10; }
+    .demo-modal { position: relative; width: 560px; max-height: calc(100dvh - 124px); overflow-y: auto; padding: 24px; border: 1px solid hsl(var(--border)); }
+    .demo-modal h2 { margin: 0; font-size: 18px; font-weight: 600; }
+    .demo-modal-subtitle { margin: 7px 0 20px; color: hsl(var(--muted-foreground)); font-size: 12px; }
+    .demo-input { width: 100%; height: 36px; padding: 0 10px; border: 1px solid hsl(var(--input)); border-radius: 7px; background: hsl(var(--card)); color: hsl(var(--foreground)); font-size: 12px; }
+    .demo-label { display: block; margin-bottom: 7px; font-size: 12px; font-weight: 500; }
+    .demo-form { display: flex; flex-direction: column; gap: 16px; padding: 16px; border: 1px solid hsl(var(--border)); border-radius: 8px; background: hsl(var(--background)); }
+    .demo-help { margin-top: 6px; color: hsl(var(--muted-foreground)); font-size: 11px; line-height: 1.6; }
+    .spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .spec-card { padding: 20px; }
+    .spec-card h2 { margin: 0 0 16px; font-size: 15px; }
+    .spec-card li { margin-bottom: 10px; color: hsl(var(--muted-foreground)); font-size: 12px; line-height: 1.6; }
+    .swatch { display: flex; gap: 12px; align-items: center; padding: 9px 0; font-size: 12px; }
+    .swatch i { display: inline-block; width: 30px; height: 30px; border: 1px solid hsl(var(--border)); border-radius: 8px; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; } ::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground) / .3); border-radius: 5px; }
+    @media(max-width:900px) { .board-note { display: none; } }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
+    <symbol id="home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 20v-7h6v7"/></symbol>
+    <symbol id="users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M17 5a3 3 0 0 1 0 6m1 3a5 5 0 0 1 3 4v3"/></symbol>
+    <symbol id="fingerprint" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 16 0M8 12a4 4 0 0 1 8 0v3m-4-3v5m-8-1 1-2m3 0v4m4 2v1m4-3-1 3m5-7-1 5"/></symbol>
+    <symbol id="settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m9 3 6 0 1 3 3 1 2 5-2 5-3 1-1 3H9l-1-3-3-1-2-5 2-5 3-1Z"/></symbol>
+    <symbol id="layers" viewBox="0 0 24 24"><path d="m12 3 10 5-10 5L2 8Zm-10 9 10 5 10-5M2 16l10 5 10-5"/></symbol>
+    <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="list" viewBox="0 0 24 24"><path d="M9 5h12M9 12h12M9 19h12M3 5h1M3 12h1M3 19h1"/></symbol>
+    <symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
+    <symbol id="power" viewBox="0 0 24 24"><path d="M12 2v10M6 5a9 9 0 1 0 12 0"/></symbol>
+    <symbol id="refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M5 7a8 8 0 0 1 13-3l2 3M19 17a8 8 0 0 1-13 3l-2-3"/></symbol>
+    <symbol id="copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 3H5a2 2 0 0 0-2 2v11"/></symbol>
+    <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
+    <symbol id="trash" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></symbol>
+    <symbol id="moon" viewBox="0 0 24 24"><path d="M21 13a9 9 0 0 1-10-10 9 9 0 1 0 10 10Z"/></symbol>
+    <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></symbol>
+    <symbol id="close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="key" viewBox="0 0 24 24"><circle cx="8" cy="8" r="5"/><path d="m12 12 9 9m-3-3 3-3m-6 0 3-3"/></symbol>
+    <symbol id="activity" viewBox="0 0 24 24"><path d="M2 12h5l3-8 4 16 3-8h5"/></symbol>
+  </defs></svg>
+  <header class="board-toolbar">
+    <strong>MINERAL / LAKE</strong>
+    <button class="board-tab" data-view="overview" role="tab" aria-selected="false">总览</button>
+    <button class="board-tab" data-view="accounts" role="tab" aria-selected="true">账号工作台</button>
+    <button class="board-tab" data-view="dialog" role="tab" aria-selected="false">添加弹窗</button>
+    <button class="board-tab" data-view="spec" role="tab" aria-selected="false">尺寸 / 颜色</button>
+    <span class="board-note">设计示例数据 · 不连接账号存储</span>
+    <button id="theme" class="board-tab">浅 / 深色</button>
+  </header>
+  <div class="app-shell">
+    <div class="app-titlebar"><span class="titlebar-label">LutraCredentials</span><span style="padding-right:16px;color:hsl(var(--muted-foreground));font-size:12px">─　□　×</span></div>
+    <div class="app-body">
+      <nav class="app-sidebar" aria-label="主导航">
+        <div class="sidebar-brand"><img src="/logo.png" alt="水獭 Lutra"/><div class="sidebar-brand-text"><div class="brand-name">Lutra</div><div class="brand-caption">CREDENTIALS</div></div></div>
+        <div><div class="sidebar-section-label">WORKSPACE</div><div class="sidebar-links">
+          <a href="#overview" class="sidebar-link" data-nav="overview"><svg class="icon"><use href="#home"/></svg><span class="sidebar-link-label">仪表盘</span></a>
+          <a href="#accounts" class="sidebar-link sidebar-link--active" data-nav="accounts"><svg class="icon"><use href="#users"/></svg><span class="sidebar-link-label">账号管理</span></a>
+          <a href="#spec" class="sidebar-link" data-nav="spec"><svg class="icon"><use href="#fingerprint"/></svg><span class="sidebar-link-label">机器码管理</span></a>
+          <a href="#spec" class="sidebar-link" data-nav="spec"><svg class="icon"><use href="#settings"/></svg><span class="sidebar-link-label">设置</span></a>
+        </div></div>
+        <div class="sidebar-footer"><div class="sidebar-utilities"><button class="button button-ghost"><svg class="icon"><use href="#globe"/></svg><span class="sidebar-language-label">中文</span></button><button class="icon-button" data-theme aria-label="切换主题"><svg class="icon"><use href="#moon"/></svg></button></div><div class="sidebar-meta"><span>LutraCredentials</span><span>v1.0.3</span></div></div>
+      </nav>
+      <main id="overview" class="board-view app-main" hidden>
+        <div class="page-stack">
+          <div class="page-header"><div><div class="page-eyebrow">WORKSPACE OVERVIEW</div><h1 class="page-title">仪表盘</h1><p class="page-description">概览您的 AI 账号和许可证</p></div><button class="button button-primary" data-go="accounts">管理账号<svg class="icon"><use href="#arrow"/></svg></button></div>
+          <div class="stat-grid" id="stats"></div>
+          <div class="dashboard-columns">
+            <section class="surface"><div class="surface-heading"><h2 class="surface-title">平台快速访问</h2><span class="surface-caption">16 个平台</span></div><div class="platform-directory" id="directory"></div></section>
+            <div class="page-stack">
+              <section class="surface"><div class="surface-heading"><h2 class="surface-title">最近活动</h2><span class="surface-caption">最近使用</span></div><div class="recent-list" id="recent"></div></section>
+              <section class="surface"><div class="surface-heading"><h2 class="surface-title">平台分布</h2><span class="surface-caption">账号数量</span></div><div class="distribution-list"><div class="distribution-row"><span>Antigravity</span><div class="distribution-bar"><span style="width:50%"></span></div><span>6</span></div><div class="distribution-row"><span>Codex</span><div class="distribution-bar"><span style="width:25%"></span></div><span>3</span></div><div class="distribution-row"><span>Claude</span><div class="distribution-bar"><span style="width:17%"></span></div><span>2</span></div><div class="distribution-row"><span>Kiro</span><div class="distribution-bar"><span style="width:8%"></span></div><span>1</span></div></div></section>
+            </div>
+          </div>
+        </div>
+      </main>
+      <main id="accounts" class="board-view app-main app-main--accounts">
+        <div class="accounts-workspace">
+          <aside class="platform-sidebar"><div class="platform-sidebar-heading"><span>平台</span><svg class="icon"><use href="#layers"/></svg></div><p class="platform-sidebar-total">12 个账号 · 16 个平台</p><div class="platform-nav-list" id="platform-nav"></div></aside>
+          <section class="account-workspace">
+            <div class="workspace-context"><div class="workspace-context-path"><span>账号管理</span><svg class="icon"><use href="#chevron"/></svg><span>Antigravity</span></div><span>6 个账号</span></div>
+            <div class="platform-account-list">
+              <header class="platform-list-header"><div><div style="display:flex;align-items:center;gap:10px"><h1 class="platform-list-title">Antigravity</h1><span class="pill">v1.18.4</span></div><p class="platform-list-description">管理您的 Google / Anthropic AI 服务账号</p></div>
+                <div class="platform-list-actions"><label class="search-field account-search"><svg class="icon"><use href="#search"/></svg><input placeholder="搜索邮箱或名称…" aria-label="搜索设计示例"/></label><div class="view-switcher"><button class="icon-button" style="background:hsl(var(--accent));color:hsl(var(--primary))" aria-label="卡片视图"><svg class="icon"><use href="#grid"/></svg></button><button class="icon-button" aria-label="列表视图"><svg class="icon"><use href="#list"/></svg></button></div><button class="button"><svg class="icon"><use href="#download"/></svg>导出</button><button class="button button-primary" data-go="dialog"><svg class="icon"><use href="#plus"/></svg>添加账号</button></div>
+              </header>
+              <div class="account-grid" id="cards"></div>
+              <p class="surface-caption">操作常驻显示 · 平台与账号区独立滚动 · 卡片按内容区宽度自适应</p>
+            </div>
+          </section>
+        </div>
+      </main>
+      <main id="spec" class="board-view app-main" hidden><div class="page-stack"><div class="page-header"><div><div class="page-eyebrow">DESIGN SYSTEM</div><h1 class="page-title">岩灰 × 湖绿</h1><p class="page-description">与正式界面共用 tokens.css、workbench.css；尺寸与颜色以代码为准。</p></div></div><div class="spec-grid">
+        <section class="surface spec-card"><h2>颜色层次</h2><div class="swatch"><i style="background:hsl(var(--background))"></i>雾白 / 深岩 · 主背景</div><div class="swatch"><i style="background:hsl(var(--card))"></i>纯白 / 岩灰 · 内容表面</div><div class="swatch"><i style="background:hsl(var(--sidebar))"></i>浅岩 / 深岩 · 主导航</div><div class="swatch"><i style="background:hsl(var(--primary))"></i>湖绿 · 主操作与选中状态</div><div class="swatch"><i style="background:hsl(var(--accent))"></i>淡湖绿 · 选中背景</div><div class="swatch"><i style="background:hsl(var(--foreground))"></i>岩灰文字 · 主信息</div></section>
+        <section class="surface spec-card"><h2>桌面几何</h2><ul><li>标题栏 32px；主导航 184px；平台列表 168px。</li><li>内容边距 24px；区块间距 20px；卡片间距 12px。</li><li>平台行 34px；主导航项 38px；工具栏 34–36px。</li><li>卡片内边距 16px；半径 10px；边框 1px。</li><li>弹窗常规宽度 560–640px；内边距 24px；视口边界至少 16px。</li><li>宽度 ≤900px 时主导航收为 68px；≤620px 平台列表改横向。</li></ul></section>
+        <section class="surface spec-card"><h2>信息与交互</h2><ul><li>标题 22px / 650；卡片身份 13px / 600；正文 12–13px；辅助信息 10–11px。</li><li>账号才是主内容，不再把 16 个平台铺成大卡片。</li><li>保留各平台 OAuth、Token、JSON、本机导入、签到、切换、刷新和编辑。</li><li>卡片操作常驻，键盘聚焦可见；不以悬浮动画或发光表达状态。</li><li>空状态至少 240px；列表、账号、弹窗使用同一套语义色。</li><li>所有数据均为设计示例，不替换应用真实账号，不用于证明业务测试通过。</li></ul></section>
+      </div></div></main>
+    </div>
+  </div>
+  <div id="dialog" class="board-view demo-modal-layer" hidden>
+    <section class="demo-modal lutra-dialog" role="dialog" aria-modal="true" aria-labelledby="demo-title">
+      <button class="icon-button" data-go="accounts" style="position:absolute;right:16px;top:16px" aria-label="关闭"><svg class="icon"><use href="#close"/></svg></button>
+      <h2 id="demo-title">添加 Antigravity 账号</h2><p class="demo-modal-subtitle">选择添加方式，授权或导入现有账号。</p>
+      <div class="lutra-dialog-body">
+        <div class="method-selector">
+          <button class="method-option method-option--active"><span class="method-option-heading"><span class="method-option-icon"><svg class="icon"><use href="#globe"/></svg></span>OAuth 授权</span><span class="method-option-description">在浏览器中安全完成官方授权</span></button>
+          <button class="method-option"><span class="method-option-heading"><span class="method-option-icon"><svg class="icon"><use href="#key"/></svg></span>Token 导入</span><span class="method-option-description">使用已有访问令牌添加账号</span></button>
+          <button class="method-option"><span class="method-option-heading"><span class="method-option-icon"><svg class="icon"><use href="#download"/></svg></span>文件导入</span><span class="method-option-description">导入已导出的账号文件</span></button>
+        </div>
+        <div class="demo-form"><div><label class="demo-label">授权方式</label><div class="demo-input" style="display:flex;align-items:center">官方 Google OAuth</div><p class="demo-help">授权在外部浏览器完成。本设计稿不会启动授权或读取凭证。</p></div><button class="button button-primary" type="button">开始授权<svg class="icon"><use href="#arrow"/></svg></button></div>
+        <p class="demo-help">统一弹窗规范：标题 + 紧凑方式选择 + 表单主体，不重复展示大平台卡片。具体字段和流程保留各平台原实现。</p>
+      </div>
+    </section>
+  </div>
+  <script>
+    const icon = (name) => `<svg class="icon"><use href="#${name}"/></svg>`;
+    const platforms = ['Antigravity','Codex','GitHub Copilot','Windsurf','Kiro','Cursor','Gemini','Claude','CodeBuddy','CodeBuddy CN','Qoder','Trae','Zed','WorkBuddy','Grok','Zcode'];
+    const counts = [6,3,0,0,1,0,0,2,0,0,0,0,0,0,0,0];
+    document.querySelector('#platform-nav').innerHTML = platforms.map((name, i) => `<button class="platform-nav-item ${i === 0 ? 'platform-nav-item--active' : ''}">${icon('layers')}<span class="platform-nav-name">${name}</span><span class="platform-nav-count">${counts[i]}</span></button>`).join('');
+    document.querySelector('#directory').innerHTML = platforms.map((name, i) => `<button class="platform-directory-row" data-go="accounts"><span class="platform-mark">${icon('layers')}</span><span class="platform-directory-info"><span class="platform-directory-name">${name}</span><span class="platform-directory-detail">${i < 8 ? '已安装' : '配置 / 导入'}</span></span><span class="platform-directory-count">${counts[i]}</span></button>`).join('');
+    document.querySelector('#stats').innerHTML = [['总账号数','12','管理的账号总数','users'],['活跃账号','4','当前标记为活跃','activity'],['支持平台','16','已注册平台','layers'],['已用平台','4','至少拥有一个账号','layers']].map(([title,value,desc,ico]) => `<div class="surface stat-tile"><div class="stat-tile-heading"><span>${title}</span>${icon(ico)}</div><div class="stat-value">${value}</div><div class="stat-description">${desc}</div></div>`).join('');
+    document.querySelector('#recent').innerHTML = [['studio@example.com','Antigravity','今天 10:42'],['coding@example.com','Codex','今天 09:18'],['research@example.com','Claude','昨天 18:30']].map(([email,platform,date]) => `<div class="recent-row"><span class="platform-mark">${icon('users')}</span><div class="platform-directory-info"><p class="recent-account">${email}</p><p class="platform-directory-detail">${platform}</p></div><span class="recent-date">${date}</span></div>`).join('');
+    const sampleAccounts = [['studio@example.com','日常开发','Pro',28,true],['research@example.com','研究与探索','Free',12,false],['coding@example.com','项目协作','Pro',46,false],['personal@example.com','个人账号','Free',8,false],['team@example.com','团队工作区','Pro',64,false],['backup@example.com','备用账号','Free',0,false]];
+    document.querySelector('#cards').innerHTML = sampleAccounts.map(([email,name,tier,quota,active]) => `<article class="account-card ${active ? 'account-card--active' : ''}"><div class="account-card-content"><div class="account-identity"><div style="min-width:0"><p class="account-email">${email}</p><p class="account-name">${name}</p></div>${active ? '<span class="pill pill-active">● 当前使用</span>' : '<span class="pill">可用</span>'}</div><div class="account-tags"><span class="pill">${tier}</span><span class="pill">Google OAuth</span></div><div class="quota-label"><span>配额使用</span><span>${quota}%</span></div><div class="quota-track"><span style="width:${quota}%"></span></div><p class="account-updated">更新于 今天 10:42</p><div class="account-card-actions"><div>${['power','refresh','copy','download'].map(action => `<button class="icon-button" aria-label="${action}（设计示例）">${icon(action)}</button>`).join('')}</div><div>${['info','trash'].map(action => `<button class="icon-button" aria-label="${action}（设计示例）">${icon(action)}</button>`).join('')}</div></div></div></article>`).join('');
+    function selectView(name) {
+      const content = name === 'dialog' ? 'accounts' : name;
+      document.querySelectorAll('.board-view').forEach(el => { el.hidden = el.id !== content && !(name === 'dialog' && el.id === 'dialog'); });
+      document.querySelectorAll('[data-view]').forEach(el => el.setAttribute('aria-selected', String(el.dataset.view === name)));
+      document.querySelectorAll('[data-nav]').forEach(el => el.classList.toggle('sidebar-link--active', el.dataset.nav === content));
+    }
+    document.addEventListener('click', (event) => {
+      const control = event.target.closest('[data-view], [data-go], [data-nav]');
+      if (control) { event.preventDefault(); selectView(control.dataset.view || control.dataset.go || control.dataset.nav); }
+      if (event.target.closest('#theme, [data-theme]')) document.documentElement.classList.toggle('dark');
+    });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') selectView('accounts'); });
+  </script>
+</body>
+</html>

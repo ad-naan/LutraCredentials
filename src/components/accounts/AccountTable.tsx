@@ -217,9 +217,9 @@ export function AccountTable({
     }
 
     return (
-        <Card className="bg-card/30 border-border/60 overflow-hidden">
+    <Card className="lutra-table bg-card border-border">
             <div className="overflow-x-auto">
-                <table className="w-full min-w-[980px]">
+      <table className="w-full min-w-[820px] text-xs">
                     <thead>
                         <tr className="border-b border-border/60 bg-muted/30">
                             <th className="text-center py-3 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider w-16">

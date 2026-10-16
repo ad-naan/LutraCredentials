@@ -310,18 +310,18 @@ export function Settings() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-10">
+    <div className="page-stack settings-page">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        <h1 className="page-title">
           {t('settings.title')}
         </h1>
-        <p className="mt-2 text-base text-muted-foreground">{t('settings.subtitle')}</p>
+        <p className="page-description">{t('settings.subtitle')}</p>
       </div>
 
       <Card className="border-border bg-card shadow-sm">
         <CardHeader className="border-b border-border pb-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-blue-500/10 p-2 text-blue-500 dark:text-blue-400">
+            <div className="rounded-lg bg-accent p-2 text-primary">
               <Database className="h-5 w-5" />
             </div>
             <div>

@@ -12,7 +12,7 @@ import { Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { usePlatformStore } from '@/stores/usePlatformStore'
 import { getPlatform } from '@/platforms/registry'
-import { cn } from '@/lib/utils'
+import { AddMethodSelector } from '@/components/accounts/AddMethodSelector'
 import type { Account } from '@/types/platform'
 
 export function AddAccountDialog() {
@@ -44,41 +44,7 @@ export function AddAccountDialog() {
 
     // 渲染添加方式选择器
     const renderMethodSelector = () => (
-        <div className="grid grid-cols-2 gap-2">
-            {methods.map((method) => {
-                const Icon = method.icon
-                const isActive = selectedMethod === method.id
-
-                return (
-                    <button
-                        key={method.id}
-                        onClick={() => setSelectedMethod(method.id)}
-                        className={cn(
-                            "p-4 rounded-xl border transition-all text-left relative overflow-hidden group",
-                            isActive
-                                ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary"
-                                : "border-border/60 hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5 bg-card"
-                        )}
-                    >
-                        <div className="flex items-center gap-3 mb-1.5">
-                            <div className={cn(
-                                "p-2 rounded-lg transition-colors",
-                                "bg-muted group-hover:bg-primary/10 group-hover:text-primary",
-                                isActive && "bg-primary text-primary-foreground"
-                            )}>
-                                <Icon className="h-5 w-5" />
-                            </div>
-                            <span className={cn("text-sm font-semibold", isActive ? "text-primary" : "text-foreground")}>
-                                {method.name}
-                            </span>
-                        </div>
-                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                            {method.description}
-                        </p>
-                    </button>
-                )
-            })}
-        </div>
+        <AddMethodSelector methods={methods} selectedId={selectedMethod} onSelect={setSelectedMethod} />
     )
 
     // 渲染选中的添加方式组件
@@ -117,9 +83,9 @@ export function AddAccountDialog() {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[550px] border-border bg-card text-card-foreground shadow-2xl">
+            <DialogContent className="sm:max-w-[560px]">
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-bold">
+                    <DialogTitle>
                         {t('dialog.addAccount')} - Claude
                     </DialogTitle>
                     <DialogDescription className="sr-only">
@@ -128,12 +94,12 @@ export function AddAccountDialog() {
                 </DialogHeader>
 
                 {/* 添加方式选择 */}
-                <div className="mt-4">
+                <div>
                     {renderMethodSelector()}
                 </div>
 
                 {/* 添加方式内容 */}
-                <div className="mt-4 min-h-[220px]">
+                <div className="min-h-0">
                     {renderMethodContent()}
                 </div>
             </DialogContent>

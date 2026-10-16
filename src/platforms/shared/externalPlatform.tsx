@@ -20,6 +20,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { AccountCard } from '@/components/accounts/AccountCardBase'
+import { AddMethodSelector } from '@/components/accounts/AddMethodSelector'
 import {
   AccountDetailsDialog,
   DetailGrid,
@@ -1203,7 +1204,7 @@ function ExternalMethodDialog({
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => (nextOpen ? onOpenChange(true) : handleClose())}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[720px]">
+      <DialogContent className="sm:max-w-[640px]">
         <DialogHeader>
           <DialogTitle>
             {t('accounts.add', { defaultValue: 'Add Account' })} {definition.name}
@@ -1211,43 +1212,7 @@ function ExternalMethodDialog({
         </DialogHeader>
 
         {methods.length > 1 && (
-          <div className="grid gap-2 sm:grid-cols-2">
-            {methods.map((item) => {
-              const Icon = item.icon
-              const isActive = item.id === selectedMethod
-
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setSelectedMethod(item.id)}
-                  className={cn(
-                    'rounded-xl border p-4 text-left transition-all',
-                    isActive
-                      ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
-                      : 'border-border/60 bg-background/70 hover:border-primary/40 hover:shadow-sm',
-                  )}
-                >
-                  <div className="mb-2 flex items-center gap-3">
-                    <div
-                      className={cn(
-                        'rounded-lg p-2',
-                        isActive
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-secondary text-foreground',
-                      )}
-                    >
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">{item.name}</span>
-                  </div>
-                  <p className="text-xs leading-relaxed text-muted-foreground">
-                    {item.description}
-                  </p>
-                </button>
-              )
-            })}
-          </div>
+          <AddMethodSelector methods={methods} selectedId={selectedMethod} onSelect={setSelectedMethod} />
         )}
 
         {MethodComponent ? (
@@ -1527,11 +1492,11 @@ function ExternalPlatformAccountList({ definition }: { definition: ExternalPlatf
     }))
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+    <div className="platform-account-list">
+      <div className="platform-list-header">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-3xl font-bold tracking-tight">{definition.name}</h2>
+            <h1 className="platform-list-title">{definition.name}</h1>
             {versionsLoading ? (
               <span className="rounded bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
                 {t('common.loading', { defaultValue: 'Loading...' })}
@@ -1550,30 +1515,32 @@ function ExternalPlatformAccountList({ definition }: { definition: ExternalPlatf
               )
             ) : (
               <span className="rounded bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-                {methods.length > 1 ? 'Multiple add methods' : 'JSON'}
+                {methods.length > 1 ? t('external.multipleMethods') : 'JSON'}
               </span>
             )}
           </div>
-          <p className="mt-2 max-w-3xl text-lg font-light text-muted-foreground">
+          <p className="platform-list-description">
             {definition.description}
           </p>
         </div>
 
-        <div className="flex w-full flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-end xl:w-auto">
+        <div className="platform-list-actions">
           {platformAccounts.length > 0 && (
             <>
               <AccountSearch
                 value={searchQuery}
                 onChange={setSearchQuery}
                 resultCount={filteredAccounts.length}
-                className="w-full md:w-72"
+                className="account-search"
               />
-              <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-background/50 p-1">
+              <div className="view-switcher">
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('grid')}
                   className="h-7 px-2"
+                  title={t('common.gridView')}
+                  aria-label={t('common.gridView')}
                 >
                   <LayoutGrid className="h-4 w-4" />
                 </Button>
@@ -1582,6 +1549,8 @@ function ExternalPlatformAccountList({ definition }: { definition: ExternalPlatf
                   size="sm"
                   onClick={() => setViewMode('list')}
                   className="h-7 px-2"
+                  title={t('common.listView')}
+                  aria-label={t('common.listView')}
                 >
                   <List className="h-4 w-4" />
                 </Button>
@@ -1593,7 +1562,7 @@ function ExternalPlatformAccountList({ definition }: { definition: ExternalPlatf
                   setExportAccounts(null)
                   setExportOpen(true)
                 }}
-                className="w-full md:w-auto"
+                className="toolbar-export"
               >
                 <Download className="mr-2 h-4 w-4" />
                 {t('common.export', { defaultValue: 'Export' })}
@@ -1605,25 +1574,25 @@ function ExternalPlatformAccountList({ definition }: { definition: ExternalPlatf
       </div>
 
       {platformAccounts.length === 0 ? (
-        <Card className="border-dashed border-2 border-muted bg-card/30">
-          <CardContent className="flex flex-col items-center justify-center py-24">
-            <div className="mb-4 rounded-full bg-background/50 p-4 ring-1 ring-white/10">
-              <definition.icon className="h-8 w-8" />
+        <Card className="account-empty-state">
+          <CardContent className="account-empty-content">
+            <div className="account-empty-icon">
+              <definition.icon aria-hidden="true" />
             </div>
-            <p className="mb-2 text-lg font-medium">
+            <p className="empty-title">
               {t('accounts.noAccounts', { defaultValue: 'No accounts yet' })}
             </p>
-            <p className="mb-6 max-w-xl text-center text-sm text-muted-foreground">
+            <p className="empty-description">
               {definition.importHint || definition.description}
             </p>
             <ExternalAddAccountDialog definition={definition} />
           </CardContent>
         </Card>
       ) : filteredAccounts.length === 0 ? (
-        <Card className="border-dashed border-2 border-muted bg-card/30">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <Search className="mb-4 h-12 w-12 text-muted-foreground/50" />
-            <p className="mb-2 text-lg font-medium">
+        <Card className="account-empty-state">
+          <CardContent className="account-empty-content">
+            <Search className="mb-3 h-6 w-6 text-muted-foreground" aria-hidden="true" />
+            <p className="empty-title">
               {t('common.noResults', { defaultValue: 'No results found' })}
             </p>
             <p className="text-sm text-muted-foreground">
@@ -1632,7 +1601,7 @@ function ExternalPlatformAccountList({ definition }: { definition: ExternalPlatf
           </CardContent>
         </Card>
       ) : viewMode === 'grid' ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="account-grid">
           {filteredAccounts.map((account) => (
             <ExternalAccountCard
               key={account.id}

@@ -7,8 +7,9 @@ import { useTranslation } from 'react-i18next'
 import packageJson from '../../../package.json'
 
 export function TopNav() {
-  const { theme, setTheme } = useTheme()
+  const { setTheme } = useTheme()
   const { t, i18n } = useTranslation()
+  const isChinese = (i18n.resolvedLanguage || i18n.language).startsWith('zh')
 
   const navigation = [
     { name: 'nav.dashboard', href: '/', icon: Home },
@@ -18,76 +19,66 @@ export function TopNav() {
   ]
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark')
-  }
-
-  const toggleLanguage = () => {
-    i18n.changeLanguage(i18n.language === 'zh' ? 'en' : 'zh')
+    setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark')
   }
 
   return (
-    <nav className="h-16 flex items-center justify-between px-6 z-40 sticky top-0 bg-background border-b border-border transition-colors duration-300">
-      {/* Logo */}
-      <div className="flex items-center gap-10">
-        <div className="flex items-center gap-3">
-          <img
-            src="/logo.png"
-            alt="Lutra"
-            className="h-9 w-9 rounded-lg object-cover ring-1 ring-border"
-          />
-          <div className="flex flex-col">
-            <h1 className="text-xl font-bold text-foreground tracking-tight">
-              {t('app.name')}
-            </h1>
-            <span className="text-xs text-muted-foreground">v{packageJson.version}</span>
-          </div>
+    <nav className="app-sidebar" aria-label={t('workbench.navigation')}>
+      <div className="sidebar-brand" title="LutraCredentials">
+        <img src="/logo.png" alt="Lutra" />
+        <div className="sidebar-brand-text">
+          <div className="brand-name">Lutra</div>
+          <div className="brand-caption">CREDENTIALS</div>
         </div>
+      </div>
 
-        {/* Navigation */}
-        <div className="flex items-center gap-1">
+      <div>
+        <div className="sidebar-section-label">{t('workbench.workspace')}</div>
+        <div className="sidebar-links">
           {navigation.map((item) => (
             <NavLink
               key={item.name}
               to={item.href}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200',
-                  isActive
-                    ? 'bg-secondary text-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                )
-              }
+              end={item.href === '/'}
+              title={t(item.name)}
+              aria-label={t(item.name)}
+              className={({ isActive }) => cn('sidebar-link', isActive && 'sidebar-link--active')}
             >
-              <item.icon className="h-4 w-4" />
-              {t(item.name)}
+              <item.icon aria-hidden="true" />
+              <span className="sidebar-link-label">{t(item.name)}</span>
             </NavLink>
           ))}
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2">
-        <div className="flex items-center border border-border rounded-md bg-background/50">
+      <div className="sidebar-footer">
+        <div className="sidebar-utilities">
           <Button
             variant="ghost"
             size="sm"
-            onClick={toggleLanguage}
-            className="h-8 px-3 text-xs font-medium hover:bg-muted text-muted-foreground hover:text-foreground"
+            onClick={() => i18n.changeLanguage(isChinese ? 'en' : 'zh')}
+            aria-label={t('workbench.switchLanguage')}
+            title={t('workbench.switchLanguage')}
+            className="h-8 px-2 text-muted-foreground"
           >
-            <Globe className="h-3.5 w-3.5 mr-2" />
-            {i18n.language === 'zh' ? '中文' : 'EN'}
+            <Globe aria-hidden="true" />
+            <span className="sidebar-language-label">{isChinese ? '中文' : 'EN'}</span>
           </Button>
-
-          <div className="w-[1px] h-4 bg-border" />
-
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="h-8 w-8 hover:bg-muted text-muted-foreground hover:text-foreground"
+            aria-label={t('workbench.toggleTheme')}
+            title={t('workbench.toggleTheme')}
+            className="h-8 w-8 text-muted-foreground"
           >
-            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            <Sun className="hidden dark:block" aria-hidden="true" />
+            <Moon className="dark:hidden" aria-hidden="true" />
           </Button>
+        </div>
+        <div className="sidebar-meta">
+          <span>LutraCredentials</span>
+          <span>v{packageJson.version}</span>
         </div>
       </div>
     </nav>

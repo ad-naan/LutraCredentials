@@ -45,13 +45,13 @@ export function AntigravityAccountList() {
   }, [antigravityAccounts, deferredSearchQuery])
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+    <div className="platform-account-list">
+      <div className="platform-list-header">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+            <h1 className="platform-list-title">
               {t('platforms.antigravity.name')}
-            </h2>
+            </h1>
             {versionsLoading ? (
               <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded animate-pulse">
                 {t('common.loading') || 'Loading...'}
@@ -68,20 +68,20 @@ export function AntigravityAccountList() {
               </span>
             )}
           </div>
-          <p className="text-muted-foreground mt-2 max-w-3xl text-lg font-light">
+          <p className="platform-list-description">
             {t('platforms.antigravity.description', 'Manage your Google/Anthropic AI service accounts')}
           </p>
         </div>
-        <div className="flex w-full flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-end xl:w-auto">
+        <div className="platform-list-actions">
           {antigravityAccounts.length > 0 && (
             <>
               <AccountSearch
                 value={searchQuery}
                 onChange={setSearchQuery}
                 resultCount={filteredAccounts.length}
-                className="w-full md:w-72"
+                className="account-search"
               />
-              <div className="flex items-center gap-1 bg-background/50 backdrop-blur-sm border border-white/10 rounded-lg p-1">
+              <div className="view-switcher">
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
                   size="sm"
@@ -105,7 +105,7 @@ export function AntigravityAccountList() {
                 variant="outline"
                 size="sm"
                 onClick={() => setExportOpen(true)}
-                className="w-full bg-background/50 border-white/10 backdrop-blur-sm hover:bg-background/80 md:w-auto"
+                className="toolbar-export"
               >
                 <Download className="h-4 w-4 mr-2" />
                 {t('common.export', { defaultValue: 'Export' })}
@@ -119,21 +119,21 @@ export function AntigravityAccountList() {
       </div>
 
       {antigravityAccounts.length === 0 ? (
-        <Card className="bg-card/30 border-dashed border-2 border-muted hover:border-muted-foreground/50 transition-colors">
-          <CardContent className="flex flex-col items-center justify-center py-24">
-            <div className="p-4 rounded-full bg-background/50 mb-4 ring-1 ring-white/10">
-              <div className="h-8 w-8 rounded-full bg-primary/20 animate-pulse" />
+        <Card className="account-empty-state">
+          <CardContent className="account-empty-content">
+            <div className="account-empty-icon">
+              <Search aria-hidden="true" />
             </div>
-            <p className="text-lg font-medium mb-2">{t('accounts.noAccounts', 'No accounts yet')}</p>
-            <p className="text-sm text-muted-foreground mb-6">Get started by adding your first account</p>
+            <p className="empty-title">{t('accounts.noAccounts')}</p>
+            <p className="empty-description">{t('workbench.firstAccount')}</p>
             <AddAccountDialog />
           </CardContent>
         </Card>
       ) : filteredAccounts.length === 0 ? (
-        <Card className="bg-card/30 border-dashed border-2 border-muted">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <Search className="h-12 w-12 text-muted-foreground/50 mb-4" />
-            <p className="text-lg font-medium mb-2">{t('common.noResults', 'No results found')}</p>
+        <Card className="account-empty-state">
+          <CardContent className="account-empty-content">
+            <Search className="mb-3 h-6 w-6 text-muted-foreground" aria-hidden="true" />
+            <p className="empty-title">{t('common.noResults')}</p>
             <p className="text-sm text-muted-foreground">
               {t('common.tryDifferentSearch', 'Try a different search term')}
             </p>
@@ -142,7 +142,7 @@ export function AntigravityAccountList() {
       ) : (
         <>
           {viewMode === 'grid' ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="account-grid">
               {filteredAccounts.map((account) => (
                 <AntigravityAccountCard
                   key={account.id}

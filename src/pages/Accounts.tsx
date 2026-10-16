@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Card, CardContent } from '@/components/ui/card'
+import { ChevronRight, Layers } from 'lucide-react'
 import { getAllPlatforms, getPlatform } from '@/platforms/registry'
 import { usePlatformStore } from '@/stores/usePlatformStore'
 import { cn } from '@/lib/utils'
@@ -15,87 +15,68 @@ export function Accounts() {
   const selectedPlatform = getPlatform(selectedPlatformId)
 
   const platformStats = useMemo(
-    () =>
-      platforms.map((platform) => ({
-        platform,
-        count: accounts.filter((account) => account.platform === platform.id).length,
-      })),
+    () => platforms.map((platform) => ({
+      platform,
+      count: accounts.filter((account) => account.platform === platform.id).length,
+    })),
     [accounts, platforms],
   )
 
-  if (!selectedPlatform) {
-    return <div>{t('accounts.platformNotFound')}</div>
-  }
-
-  const AccountListComponent = selectedPlatform.AccountList
+  const AccountListComponent = selectedPlatform?.AccountList
+  const selectedCount = platformStats.find(({ platform }) => platform.id === selectedPlatformId)?.count || 0
 
   return (
-    <div className="space-y-6">
-      <Card className="border-border/60 bg-card/60 shadow-sm">
-        <CardContent className="space-y-5 p-5">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">{t('accounts.platformWorkspace')}</p>
-              <h1 className="text-2xl font-bold tracking-tight">{selectedPlatform.name}</h1>
-              <p className="max-w-3xl text-sm text-muted-foreground">{selectedPlatform.description}</p>
-            </div>
-            <div className="rounded-xl border border-border/60 bg-background/70 px-3 py-2 text-sm text-muted-foreground">
-              {t('accounts.accountsAcross', {
-                count: platformStats.reduce((sum, item) => sum + item.count, 0),
-                total: platforms.length,
-              })}
-            </div>
+    <div className="accounts-workspace">
+      <aside className="platform-sidebar" aria-label={t('workbench.platforms')}>
+        <div className="platform-sidebar-heading">
+          <span>{t('workbench.platforms')}</span>
+          <Layers className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+        </div>
+        <p className="platform-sidebar-total">
+          {t('workbench.accountSummary', { count: accounts.length, total: platforms.length })}
+        </p>
+        <div className="platform-nav-list">
+          {platformStats.map(({ platform, count }) => {
+            const Icon = platform.icon
+            const isActive = platform.id === selectedPlatformId
+
+            return (
+              <button
+                key={platform.id}
+                type="button"
+                onClick={() => setSearchParams((previous) => {
+                  const next = new URLSearchParams(previous)
+                  next.set('platform', platform.id)
+                  return next
+                })}
+                aria-pressed={isActive}
+                title={platform.name}
+                className={cn('platform-nav-item', isActive && 'platform-nav-item--active')}
+              >
+                <Icon aria-hidden="true" />
+                <span className="platform-nav-name">{platform.name}</span>
+                <span className="platform-nav-count">{count}</span>
+              </button>
+            )
+          })}
+        </div>
+      </aside>
+
+      <section className="account-workspace" key={selectedPlatformId} aria-label={selectedPlatform?.name}>
+        <div className="workspace-context">
+          <div className="workspace-context-path">
+            <span>{t('nav.accounts')}</span>
+            <ChevronRight aria-hidden="true" />
+            <span>{selectedPlatform?.name || selectedPlatformId}</span>
           </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-            {platformStats.map(({ platform, count }) => {
-              const Icon = platform.icon
-              const isActive = platform.id === selectedPlatformId
-
-              return (
-                <button
-                  key={platform.id}
-                  type="button"
-                  onClick={() => setSearchParams({ platform: platform.id })}
-                  className={cn(
-                    'group rounded-2xl border p-4 text-left transition-all',
-                    'hover:border-primary/40 hover:shadow-md',
-                    isActive
-                      ? 'border-primary bg-primary/5 shadow-sm ring-1 ring-primary/30'
-                      : 'border-border/60 bg-background/50',
-                  )}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div
-                      className={cn(
-                        'rounded-xl p-3 transition-colors',
-                        isActive ? 'bg-primary text-primary-foreground' : 'bg-secondary text-foreground',
-                      )}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <span
-                      className={cn(
-                        'rounded-full px-2.5 py-1 text-xs font-medium',
-                        isActive ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground',
-                      )}
-                    >
-                      {count}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 space-y-1">
-                    <h2 className="font-semibold leading-tight text-foreground">{platform.name}</h2>
-                    <p className="line-clamp-2 text-sm text-muted-foreground">{platform.description}</p>
-                  </div>
-                </button>
-              )
-            })}
+          <span>{t('dashboard.accountCount', { count: selectedCount })}</span>
+        </div>
+        {AccountListComponent ? <AccountListComponent /> : (
+          <div className="account-empty-state account-empty-content">
+            <p className="empty-title">{t('accounts.platformNotFound')}</p>
           </div>
-        </CardContent>
-      </Card>
-
-      <AccountListComponent />
+        )}
+      </section>
     </div>
   )
 }

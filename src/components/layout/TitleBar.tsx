@@ -15,13 +15,15 @@ export function TitleBar() {
 
   return (
     <div
-      className="h-8 bg-background flex items-center justify-end px-3 select-none border-b border-border"
+      className="app-titlebar"
       data-tauri-drag-region
     >
+      <span className="titlebar-label" data-tauri-drag-region>LutraCredentials</span>
       {/* Window Controls (Windows Style but minimal) */}
       <div className="flex items-center gap-1">
         <Button
           onClick={handleMinimize}
+          aria-label="Minimize"
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-muted text-muted-foreground hover:text-foreground rounded-none"
@@ -30,6 +32,7 @@ export function TitleBar() {
         </Button>
         <Button
           onClick={handleMaximize}
+          aria-label="Maximize / restore"
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-muted text-muted-foreground hover:text-foreground rounded-none"
@@ -38,6 +41,7 @@ export function TitleBar() {
         </Button>
         <Button
           onClick={handleClose}
+          aria-label="Close window"
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-destructive hover:text-destructive-foreground text-muted-foreground rounded-none"

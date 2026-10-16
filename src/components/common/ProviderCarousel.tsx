@@ -1,11 +1,10 @@
 /**
- * Provider 轮播选择组件 - 极简风格
+ * Provider 紧凑分页选择组件
  * 用于在添加账号时选择供应商
  */
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Check, ExternalLink, Star } from 'lucide-react'
+import { Check, ExternalLink, Star } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { ProviderPreset, ProviderCategory } from '@/types/provider'
 
@@ -24,94 +23,42 @@ const categoryLabels: Record<ProviderCategory, { zh: string; en: string }> = {
   custom: { zh: '自定义', en: 'Custom' },
 }
 
-export function ProviderCarousel({
-  providers,
-  selectedId,
-  onSelect,
-  isEn = false,
-}: ProviderCarouselProps) {
+export function ProviderCarousel({ providers, selectedId, onSelect, isEn = false }: ProviderCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const itemsPerPage = 6
-  const totalPages = Math.ceil(providers.length / itemsPerPage)
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : totalPages - 1))
-  }
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev < totalPages - 1 ? prev + 1 : 0))
-  }
-
-  const currentProviders = providers.slice(
-    currentIndex * itemsPerPage,
-    (currentIndex + 1) * itemsPerPage
-  )
+  const itemsPerPage = 9
+  const totalPages = Math.max(1, Math.ceil(providers.length / itemsPerPage))
+  const pageIndex = Math.min(currentIndex, totalPages - 1)
+  const currentProviders = providers.slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage)
 
   return (
-    <div className="space-y-3">
-      <div className="relative px-10">
-        {/* 左箭头 */}
-        {totalPages > 1 && (
-          <button
-            type="button"
-            onClick={handlePrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm border flex items-center justify-center hover:bg-accent transition-colors"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-        )}
-
-        {/* 卡片容器 */}
-        <div className="overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentIndex}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-              className="grid grid-cols-3 gap-2"
-            >
-              {currentProviders.map((provider) => (
-                <ProviderCard
-                  key={provider.id}
-                  provider={provider}
-                  isSelected={selectedId === provider.id}
-                  onSelect={() => onSelect(provider.id)}
-                  isEn={isEn}
-                />
-              ))}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* 右箭头 */}
-        {totalPages > 1 && (
-          <button
-            type="button"
-            onClick={handleNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm border flex items-center justify-center hover:bg-accent transition-colors"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        )}
+    <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {currentProviders.map((provider) => (
+          <ProviderCard
+            key={provider.id}
+            provider={provider}
+            isSelected={selectedId === provider.id}
+            onSelect={() => onSelect(provider.id)}
+            isEn={isEn}
+          />
+        ))}
       </div>
-
-      {/* 分页指示器 */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-1.5">
-          {Array.from({ length: totalPages }).map((_, index) => (
+        <div className="flex justify-end gap-1">
+          {Array.from({ length: totalPages }, (_, index) => (
             <button
               key={index}
               type="button"
               onClick={() => setCurrentIndex(index)}
+              aria-label={`${isEn ? 'Page' : '第'} ${index + 1}${isEn ? '' : ' 页'}`}
+              aria-pressed={index === pageIndex}
               className={cn(
-                "h-1 rounded-full transition-all",
-                index === currentIndex
-                  ? "w-6 bg-primary"
-                  : "w-1 bg-border hover:bg-muted-foreground/50"
+                'h-6 min-w-6 rounded px-1 text-[10px] transition-colors',
+                index === pageIndex ? 'bg-accent text-primary' : 'text-muted-foreground hover:bg-muted',
               )}
-            />
+            >
+              {index + 1}
+            </button>
           ))}
         </div>
       )}
@@ -133,34 +80,20 @@ function ProviderCard({ provider, isSelected, onSelect, isEn }: ProviderCardProp
     <button
       type="button"
       onClick={onSelect}
+      aria-pressed={isSelected}
+      title={provider.name}
       className={cn(
-        "relative group flex flex-col items-center justify-center p-3 rounded-lg border transition-all min-h-[90px]",
-        isSelected
-          ? "border-primary bg-primary/5"
-          : "border-border hover:border-primary/50 hover:bg-accent/50"
+        'flex min-h-12 items-center gap-2 rounded-lg border px-3 py-2 text-left transition-colors',
+        isSelected ? 'border-primary/50 bg-accent/60' : 'border-border bg-card hover:border-primary/40',
       )}
     >
-      {/* 选中标记 */}
-      {isSelected && (
-        <div className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-primary flex items-center justify-center">
-          <Check className="h-2.5 w-2.5 text-primary-foreground" />
-        </div>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-xs font-medium">{provider.name}</span>
+        <span className="block text-[10px] text-muted-foreground">{isEn ? categoryLabel.en : categoryLabel.zh}</span>
+      </span>
+      {isSelected ? <Check className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden="true" /> : (
+        provider.isPartner ? <Star className="h-3 w-3 shrink-0 text-amber-600" aria-hidden="true" /> : null
       )}
-
-      {/* 合作伙伴星标 */}
-      {provider.isPartner && !isSelected && (
-        <Star className="absolute top-1.5 right-1.5 h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
-      )}
-
-      {/* 分类标签 */}
-      <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[10px] text-muted-foreground bg-muted/50">
-        {isEn ? categoryLabel.en : categoryLabel.zh}
-      </div>
-
-      {/* 供应商名称 */}
-      <div className="text-sm font-medium text-center mt-4 line-clamp-2">
-        {provider.name}
-      </div>
     </button>
   )
 }

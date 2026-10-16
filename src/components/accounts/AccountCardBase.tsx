@@ -106,11 +106,9 @@ export const AccountCard = memo(function AccountCard({
   return (
     <Card
       className={cn(
-        'relative transition-all duration-300 cursor-pointer overflow-hidden group',
-        'border-border/60 bg-card shadow-sm',
-        'hover:shadow-lg hover:-translate-y-1 hover:border-primary/20',
-        isActive && 'ring-2 ring-primary/50 shadow-lg shadow-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/30',
-        hasWarning && 'border-destructive/30 bg-destructive/5',
+        'account-card group',
+        isActive && 'account-card--active',
+        hasWarning && 'account-card--warning',
         className
       )}
     >
@@ -121,17 +119,10 @@ export const AccountCard = memo(function AccountCard({
         </div>
       )}
 
-      {/* 激活指示器 - 顶部光晕效果 */}
-      {isActive && (
-        <>
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent" />
-          <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
-        </>
-      )}
 
       <CardContent className={cn(
-        'space-y-3',
-        variant === 'compact' ? 'p-3' : 'p-4'
+        'account-card-content space-y-3',
+        variant === 'compact' && 'p-3'
       )}>
         {/* 自定义头部或默认头部 */}
         {header || (
@@ -140,8 +131,8 @@ export const AccountCard = memo(function AccountCard({
               <div className="flex items-center gap-2 mb-1">
                 <h3
                   className={cn(
-                    "font-semibold text-sm truncate cursor-pointer transition-colors",
-                    copied ? "text-green-500" : "hover:text-primary"
+                    "font-semibold text-[13px] truncate cursor-pointer transition-colors",
+                    copied ? "text-primary" : "hover:text-primary"
                   )}
                   onClick={handleCopy}
                   title={email}
@@ -149,7 +140,7 @@ export const AccountCard = memo(function AccountCard({
                   {copied ? t('common.copied') : email}
                 </h3>
                 {isActive && (
-                  <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary" aria-label={t('external.active')} />
                 )}
               </div>
               {name && (
@@ -173,10 +164,7 @@ export const AccountCard = memo(function AccountCard({
         {content}
 
         {/* 底部操作栏 */}
-        <div className={cn(
-          "flex items-center justify-between pt-3 border-t border-border/50",
-          "opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-        )}>
+        <div className="account-card-actions">
           {/* 左侧操作 */}
           <div className="flex items-center gap-0.5">
             {onSwitch && (

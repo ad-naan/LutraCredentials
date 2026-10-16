@@ -177,13 +177,13 @@ export function MachineId() {
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="page-stack machine-page">
       {/* 页面标题 */}
       <div>
-        <h2 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+        <h2 className="page-title">
           {t('machineId.title', 'Machine ID Management')}
         </h2>
-        <p className="text-muted-foreground mt-2 text-lg font-light">
+        <p className="page-description">
           {t('machineId.description', 'Manage device identifiers and account bindings')}
         </p>
       </div>

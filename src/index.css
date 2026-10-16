@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+@import "./styles/tokens.css";
+@import "./styles/workbench.css";
 
 @theme {
   --color-background: hsl(var(--background));
@@ -24,72 +26,10 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  --font-sans: var(--workbench-font);
 }
 
-:root {
-  /* LIGHT MODE (Clean, stark white/zinc) */
-  --background: 0 0% 100%;
-  --foreground: 240 10% 3.9%;
-
-  --card: 0 0% 100%;
-  --card-foreground: 240 10% 3.9%;
-
-  --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 3.9%;
-
-  --primary: 240 5.9% 10%;
-  --primary-foreground: 0 0% 98%;
-
-  --secondary: 240 4.8% 95.9%;
-  --secondary-foreground: 240 5.9% 10%;
-
-  --muted: 240 4.8% 95.9%;
-  --muted-foreground: 240 3.8% 46.1%;
-
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
-
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-
-  --border: 240 5.9% 90%;
-  --input: 240 5.9% 90%;
-  --ring: 240 5.9% 10%;
-
-  --radius: 0.75rem;
-}
-
-.dark {
-  /* DARK MODE (Deep Zinc/Graphite - The Main Event) */
-  --background: 240 10% 3.9%; /* Zinc 950 #09090b */
-  --foreground: 0 0% 98%;      /* Zinc 50 #fafafa */
-
-  --card: 240 10% 3.9%;        /* Transparent/Same as BG */
-  --card-foreground: 0 0% 98%;
-
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-
-  --primary: 0 0% 98%;         /* White primary actions in dark mode */
-  --primary-foreground: 240 5.9% 10%;
-
-  --secondary: 240 3.7% 15.9%; /* Zinc 800 #27272a */
-  --secondary-foreground: 0 0% 98%;
-
-  --muted: 240 3.7% 15.9%;     /* Zinc 800 */
-  --muted-foreground: 240 5% 64.9%; /* Zinc 400 #a1a1aa */
-
-  --accent: 240 3.7% 15.9%;    /* Zinc 800 */
-  --accent-foreground: 0 0% 98%;
-
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-
-  --border: 240 3.7% 15.9%;    /* Zinc 800 - Subtle but crisp */
-  --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;      /* Zinc 300 */
-}
+/* Semantic colors and geometry live in styles/tokens.css and styles/workbench.css. */
 
 * {
   border-color: hsl(var(--border));
@@ -106,7 +46,7 @@ body,
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--workbench-font);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11"; /* Clean, modern character variants */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
