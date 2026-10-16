@@ -12,6 +12,8 @@ export type KnownPlatformType =
   | 'qoder'
   | 'trae'
   | 'zed'
+  | 'grok'
+  | 'zcode'
   | 'workbuddy'
 
 export type PlatformType = KnownPlatformType | (string & {})
