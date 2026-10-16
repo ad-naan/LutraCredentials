@@ -482,6 +482,11 @@
         "unhealthy": "异常",
         "totalRequests": "总请求",
         "failedRequests": "失败请求",
-        "upstreams": "上游数"
+        "upstreams": "上游数",
+        "aggregationMode": "聚合模式",
+        "aggregationMode_Disabled": "禁用（故障转移）",
+        "aggregationMode_Race": "竞速（首个成功）",
+        "aggregationMode_LowestLatency": "最低延迟",
+        "aggregationTimeout": "聚合超时 (ms)"
     }
 }

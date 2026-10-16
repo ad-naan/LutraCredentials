@@ -13,6 +13,8 @@ export interface UpstreamConfig {
   enabled: boolean
 }
 
+export type AggregationMode = 'Disabled' | 'Race' | 'LowestLatency'
+
 export interface ProxyConfig {
   enabled: boolean
   port: number
@@ -20,6 +22,8 @@ export interface ProxyConfig {
   failover_enabled: boolean
   max_retries: number
   health_check_interval_secs: number
+  aggregation_mode: AggregationMode
+  aggregation_timeout_ms: number
 }
 
 export interface UpstreamHealth {

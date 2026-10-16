@@ -1,4 +1,4 @@
-//! 本地代理引擎：将 HTTP 请求转发到配置的 AI 提供商，支持故障转移
+//! 本地代理引擎：将 HTTP 请求转发到配置的 AI 提供商，支持故障转移和聚合模式
 
 use axum::{
     body::Body,
@@ -11,7 +11,7 @@ use http::{Method, Uri, HeaderMap, header};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, sync::Arc, time::Duration};
-use tokio::{net::TcpListener, sync::RwLock};
+use tokio::{net::TcpListener, sync::RwLock, task::JoinHandle};
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
 
@@ -224,60 +224,78 @@ impl ProxyRuntimeInner {
         log_debug(&format!("Aggregated forwarding to {} upstreams (mode: {:?})", upstreams.len(), mode));
 
         let timeout = Duration::from_millis(timeout_ms);
-        let mut futures = Vec::new();
+        let client = self.http_client.clone();
 
-        for upstream in upstreams {
-            let u = upstream.clone();
-            let m = method.clone();
-            let u_uri = uri.clone();
-            let h = headers.clone();
-            let b = body.clone();
-            let client = self.http_client.clone();
+        // 为每个上游创建一个 future，返回 (UpstreamConfig, Result<Response, String>, elapsed_ms)
+        let futures: Vec<_> = upstreams
+            .iter()
+            .map(|upstream| {
+                let u = upstream.clone();
+                let m = method.clone();
+                let u_uri = uri.clone();
+                let h = headers.clone();
+                let b = body.clone();
+                let client = client.clone();
+                async move {
+                    let start = std::time::Instant::now();
+                    let result = forward_single_static(&client, &u, &m, &u_uri, &h, &b).await;
+                    let elapsed = start.elapsed().as_millis() as u64;
+                    (u, result, elapsed)
+                }
+            })
+            .collect();
 
-            futures.push(async move {
-                let start = std::time::Instant::now();
-                let result = forward_single_static(&client, &u, &m, &u_uri, &h, &b).await;
-                let elapsed = start.elapsed().as_millis() as u64;
-                (u, result, elapsed)
-            });
-        }
-
-        // 并行执行，取首个成功（Race）或延迟最低（LowestLatency）
         match mode {
             AggregationMode::Race => {
-                // 使用 tokio::select! 风格：取首个成功
-                let results = tokio::time::timeout(
-                    timeout,
-                    futures::future::join_all(futures),
-                ).await.map_err(|_| "Aggregation timeout".to_string())?;
+                // 真正的竞速：用 tokio::select! 等待第一个成功响应
+                // 使用 channel 收集第一个成功结果
+                let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<
+                    (UpstreamConfig, Response<Body>, u64),
+                >();
 
-                // 找到第一个成功的
-                for (upstream, result, latency) in results {
-                    match result {
-                        Ok(response) => {
-                            log_debug(&format!("Aggregated race winner: {} ({}ms)", upstream.name, latency));
-                            let mut status = self.status.write().await;
-                            status.active_upstream_id = Some(upstream.id.clone());
-                            status.active_upstream_name = Some(upstream.name.clone());
-                            status.total_requests += 1;
-                            return Ok(response);
+                let mut handles = Vec::new();
+                for fut in futures {
+                    let tx = tx.clone();
+                    handles.push(tokio::spawn(async move {
+                        let (upstream, result, latency) = fut.await;
+                        if let Ok(response) = result {
+                            let _ = tx.send((upstream, response, latency));
                         }
-                        Err(e) => {
-                            log_error(&format!("Aggregated upstream {} failed: {}", upstream.name, e));
-                        }
+                    }));
+                }
+                drop(tx); // 关闭发送端，所有 spawn 完成后 rx 会结束
+
+                // 等待第一个成功结果或超时
+                match tokio::time::timeout(timeout, rx.recv()).await {
+                    Ok(Some((upstream, response, latency))) => {
+                        log_debug(&format!("Aggregated race winner: {} ({}ms)", upstream.name, latency));
+                        let mut status = self.status.write().await;
+                        status.active_upstream_id = Some(upstream.id.clone());
+                        status.active_upstream_name = Some(upstream.name.clone());
+                        status.total_requests += 1;
+                        Ok(response)
+                    }
+                    Ok(None) => {
+                        // 所有上游都失败了
+                        let mut status = self.status.write().await;
+                        status.failed_requests += 1;
+                        Err("All aggregated upstreams failed".to_string())
+                    }
+                    Err(_) => {
+                        let mut status = self.status.write().await;
+                        status.failed_requests += 1;
+                        Err("Aggregation timeout".to_string())
                     }
                 }
-
-                let mut status = self.status.write().await;
-                status.failed_requests += 1;
-                Err("All aggregated upstreams failed".to_string())
             }
             AggregationMode::LowestLatency => {
                 // 等待所有完成，取延迟最低的成功响应
                 let results = tokio::time::timeout(
                     timeout,
                     futures::future::join_all(futures),
-                ).await.map_err(|_| "Aggregation timeout".to_string())?;
+                )
+                .await
+                .map_err(|_| "Aggregation timeout".to_string())?;
 
                 let mut best: Option<(UpstreamConfig, Response<Body>, u64)> = None;
 
@@ -420,7 +438,15 @@ async fn forward_single_static(
         .map_err(|e| format!("Build response failed: {}", e))
 }
 
-static PROXY_RUNTIME: std::sync::OnceLock<Arc<ProxyRuntimeInner>> = std::sync::OnceLock::new();
+/// 代理运行时句柄：包含运行时状态和服务器任务句柄
+struct ProxyRuntimeHandle {
+    runtime: Arc<ProxyRuntimeInner>,
+    server_handle: JoinHandle<()>,
+    health_check_handle: JoinHandle<()>,
+}
+
+static PROXY_RUNTIME: once_cell::sync::Lazy<tokio::sync::RwLock<Option<ProxyRuntimeHandle>>> = 
+    once_cell::sync::Lazy::new(|| tokio::sync::RwLock::new(None));
 
 async fn proxy_handler(
     State(state): State<Arc<ProxyRuntimeInner>>,
@@ -447,8 +473,37 @@ async fn proxy_handler(
     }
 }
 
+/// 定期健康检查任务
+async fn periodic_health_check(runtime: Arc<ProxyRuntimeInner>, interval_secs: u64) {
+    if interval_secs == 0 {
+        return;
+    }
+
+    let mut interval = tokio::time::interval(Duration::from_secs(interval_secs));
+    loop {
+        interval.tick().await;
+        
+        // 检查是否已停止
+        let should_stop = {
+            let status = runtime.status.read().await;
+            !status.running
+        };
+        
+        if should_stop {
+            break;
+        }
+
+        let health = runtime.health_check().await;
+        let mut status = runtime.status.write().await;
+        status.upstreams_health = health;
+        log_debug("Periodic health check completed");
+    }
+    log_info("Health check task stopped");
+}
+
 pub async fn start_proxy_server(config: ProxyConfig) -> Result<ProxyStatus, String> {
-    let _ = stop_proxy_server().await;
+    // 先停止现有服务器
+    stop_proxy_server().await?;
     tokio::time::sleep(Duration::from_millis(200)).await;
 
     let runtime = Arc::new(ProxyRuntimeInner::new(config.clone()));
@@ -471,10 +526,18 @@ pub async fn start_proxy_server(config: ProxyConfig) -> Result<ProxyStatus, Stri
 
     log_info(&format!("Proxy server binding on 127.0.0.1:{}", config.port));
 
-    tokio::spawn(async move {
+    // 启动 HTTP 服务器任务
+    let server_handle = tokio::spawn(async move {
         if let Err(e) = axum::serve(listener, app).await {
             log_error(&format!("Proxy server error: {}", e));
         }
+    });
+
+    // 启动定期健康检查任务
+    let health_runtime = runtime.clone();
+    let health_check_interval = config.health_check_interval_secs;
+    let health_check_handle = tokio::spawn(async move {
+        periodic_health_check(health_runtime, health_check_interval).await;
     });
 
     tokio::time::sleep(Duration::from_millis(300)).await;
@@ -496,33 +559,53 @@ pub async fn start_proxy_server(config: ProxyConfig) -> Result<ProxyStatus, Stri
         *s = status.clone();
     }
 
-    let _ = PROXY_RUNTIME.set(runtime);
+    // 保存运行时句柄
+    let handle = ProxyRuntimeHandle {
+        runtime,
+        server_handle,
+        health_check_handle,
+    };
+    let mut guard = PROXY_RUNTIME.write().await;
+    *guard = Some(handle);
 
     log_info("Proxy server started successfully");
     Ok(status)
 }
 
 pub async fn stop_proxy_server() -> Result<(), String> {
-    if let Some(runtime) = PROXY_RUNTIME.get() {
-        let mut status = runtime.status.write().await;
-        status.running = false;
-        status.error = None;
+    let mut guard = PROXY_RUNTIME.write().await;
+    if let Some(handle) = guard.take() {
+        // 停止健康检查任务
+        handle.health_check_handle.abort();
+        
+        // 停止 HTTP 服务器
+        handle.server_handle.abort();
+        
+        // 更新状态
+        {
+            let mut status = handle.runtime.status.write().await;
+            status.running = false;
+            status.error = None;
+        }
+        
         log_info("Proxy server stopped");
     }
     Ok(())
 }
 
 pub async fn get_proxy_status() -> Result<ProxyStatus, String> {
-    if let Some(runtime) = PROXY_RUNTIME.get() {
-        Ok(runtime.status.read().await.clone())
+    let guard = PROXY_RUNTIME.read().await;
+    if let Some(handle) = guard.as_ref() {
+        Ok(handle.runtime.status.read().await.clone())
     } else {
         Ok(ProxyStatus::default())
     }
 }
 
 pub async fn get_proxy_config() -> Result<ProxyConfig, String> {
-    if let Some(runtime) = PROXY_RUNTIME.get() {
-        Ok(runtime.config.read().await.clone())
+    let guard = PROXY_RUNTIME.read().await;
+    if let Some(handle) = guard.as_ref() {
+        Ok(handle.runtime.config.read().await.clone())
     } else {
         Ok(ProxyConfig::default())
     }
@@ -577,9 +660,10 @@ pub async fn proxy_health_check() -> Result<Vec<UpstreamHealth>, String> {
         return Err("Proxy is not running".to_string());
     }
 
-    if let Some(runtime) = PROXY_RUNTIME.get() {
-        let health = runtime.health_check().await;
-        let mut status = runtime.status.write().await;
+    let guard = PROXY_RUNTIME.read().await;
+    if let Some(handle) = guard.as_ref() {
+        let health = handle.runtime.health_check().await;
+        let mut status = handle.runtime.status.write().await;
         status.upstreams_health = health.clone();
         Ok(health)
     } else {

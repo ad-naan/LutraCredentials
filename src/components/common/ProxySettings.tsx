@@ -62,39 +62,29 @@ export function ProxySettings() {
 
   const [editingConfig, setEditingConfig] = useState<ProxyConfig | null>(null)
 
-  const workingConfig = editingConfig ?? config ?? {
+  const defaultConfig: ProxyConfig = {
     enabled: false,
     port: 3456,
     upstreams: [],
     failover_enabled: true,
     max_retries: 3,
     health_check_interval_secs: 30,
+    aggregation_mode: 'Disabled',
+    aggregation_timeout_ms: 30000,
   }
+
+  const workingConfig = editingConfig ?? config ?? defaultConfig
 
   const updateConfig = useCallback((patch: Partial<ProxyConfig>) => {
     setEditingConfig((prev) => {
-      const base = prev ?? config ?? {
-        enabled: false,
-        port: 3456,
-        upstreams: [],
-        failover_enabled: true,
-        max_retries: 3,
-        health_check_interval_secs: 30,
-      }
+      const base = prev ?? config ?? defaultConfig
       return { ...base, ...patch }
     })
   }, [config])
 
   const updateUpstream = useCallback((id: string, patch: Partial<UpstreamConfig>) => {
     setEditingConfig((prev) => {
-      const base = prev ?? config ?? {
-        enabled: false,
-        port: 3456,
-        upstreams: [],
-        failover_enabled: true,
-        max_retries: 3,
-        health_check_interval_secs: 30,
-      }
+      const base = prev ?? config ?? defaultConfig
       return {
         ...base,
         upstreams: base.upstreams.map((u) =>
@@ -106,14 +96,7 @@ export function ProxySettings() {
 
   const addUpstream = useCallback(() => {
     setEditingConfig((prev) => {
-      const base = prev ?? config ?? {
-        enabled: false,
-        port: 3456,
-        upstreams: [],
-        failover_enabled: true,
-        max_retries: 3,
-        health_check_interval_secs: 30,
-      }
+      const base = prev ?? config ?? defaultConfig
       const u = defaultUpstream()
       u.priority = base.upstreams.length
       return {
@@ -125,14 +108,7 @@ export function ProxySettings() {
 
   const removeUpstream = useCallback((id: string) => {
     setEditingConfig((prev) => {
-      const base = prev ?? config ?? {
-        enabled: false,
-        port: 3456,
-        upstreams: [],
-        failover_enabled: true,
-        max_retries: 3,
-        health_check_interval_secs: 30,
-      }
+      const base = prev ?? config ?? defaultConfig
       return {
         ...base,
         upstreams: base.upstreams.filter((u) => u.id !== id),
@@ -267,6 +243,38 @@ export function ProxySettings() {
                 disabled={!workingConfig.failover_enabled}
               />
             </div>
+          </div>
+
+          {/* 聚合模式 */}
+          <div className="space-y-3">
+            <Label>{t('proxy.aggregationMode')}</Label>
+            <div className="flex flex-wrap gap-2">
+              {(['Disabled', 'Race', 'LowestLatency'] as const).map((mode) => (
+                <Button
+                  key={mode}
+                  variant={workingConfig.aggregation_mode === mode ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => updateConfig({ aggregation_mode: mode })}
+                >
+                  {t(`proxy.aggregationMode_${mode}`)}
+                </Button>
+              ))}
+            </div>
+            {workingConfig.aggregation_mode !== 'Disabled' && (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">{t('proxy.aggregationTimeout')}</Label>
+                  <Input
+                    type="number"
+                    value={workingConfig.aggregation_timeout_ms}
+                    onChange={(e) => updateConfig({ aggregation_timeout_ms: parseInt(e.target.value, 10) || 30000 })}
+                    className="h-8 text-sm"
+                    min={1000}
+                    max={120000}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <Separator />

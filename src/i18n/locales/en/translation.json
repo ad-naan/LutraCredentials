@@ -483,6 +483,11 @@
         "unhealthy": "Unhealthy",
         "totalRequests": "Total Requests",
         "failedRequests": "Failed Requests",
-        "upstreams": "Upstreams"
+        "upstreams": "Upstreams",
+        "aggregationMode": "Aggregation Mode",
+        "aggregationMode_Disabled": "Disabled (Failover)",
+        "aggregationMode_Race": "Race (First Success)",
+        "aggregationMode_LowestLatency": "Lowest Latency",
+        "aggregationTimeout": "Aggregation Timeout (ms)"
     }
 }
