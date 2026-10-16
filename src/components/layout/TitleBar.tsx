@@ -2,12 +2,16 @@ import { X, Minus, Square } from 'lucide-react'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { Button } from '@/components/ui/button'
 
-export function TitleBar() {
-  const appWindow = getCurrentWindow()
+const isTauriRuntime = () =>
+  typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
 
-  const handleMinimize = () => appWindow.minimize()
-  const handleMaximize = () => appWindow.toggleMaximize()
-  const handleClose = () => appWindow.close()
+export function TitleBar() {
+  // In a plain browser (vite dev preview), the Tauri window API is unavailable.
+  const appWindow = isTauriRuntime() ? getCurrentWindow() : null
+
+  const handleMinimize = () => appWindow?.minimize()
+  const handleMaximize = () => appWindow?.toggleMaximize()
+  const handleClose = () => appWindow?.close()
 
   return (
     <div

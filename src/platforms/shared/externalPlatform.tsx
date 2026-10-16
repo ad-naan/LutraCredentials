@@ -293,7 +293,7 @@ function ExternalAccountForm({
       if (!name.trim()) setName(extractSuggestedName(parsed))
       if (!providerId.trim()) setProviderId(extractSuggestedProviderId(parsed))
     } catch (error) {
-      setJsonError(error instanceof Error ? error.message : 'Invalid JSON file')
+      setJsonError(error instanceof Error ? error.message : t('external.invalidJsonFile'))
     } finally {
       event.target.value = ''
     }
@@ -326,7 +326,7 @@ function ExternalAccountForm({
       onSuccess?.()
     } catch (error) {
       setStatus('error')
-      setMessage(error instanceof Error ? error.message : 'Failed to save account')
+      setMessage(error instanceof Error ? error.message : t('external.saveFailed'))
       if (error instanceof SyntaxError) {
         setJsonError(error.message)
       }

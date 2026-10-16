@@ -64,28 +64,28 @@ export function Dashboard() {
           title={t('dashboard.totalAccounts', { defaultValue: 'Total Accounts' })}
           value={accounts.length}
           icon={Users}
-          description="Total managed accounts"
+          description={t('dashboard.totalAccountsDesc')}
           className="bg-card shadow-sm border-border"
         />
         <StatCard
           title={t('dashboard.activeAccount', { defaultValue: 'Active Accounts' })}
           value={activeAccounts}
           icon={Activity}
-          description="Currently marked as active"
+          description={t('dashboard.activeAccountsDesc')}
           className="bg-card shadow-sm border-border"
         />
         <StatCard
-          title="Supported Platforms"
+          title={t('dashboard.supportedPlatforms')}
           value={platforms.length}
           icon={Layers}
-          description="Registered in the current architecture"
+          description={t('dashboard.supportedPlatformsDesc')}
           className="bg-card shadow-sm border-border"
         />
         <StatCard
-          title="Platforms In Use"
+          title={t('dashboard.platformsInUse')}
           value={nonEmptyPlatforms}
           icon={Layers}
-          description="Platforms with at least one account"
+          description={t('dashboard.platformsInUseDesc')}
           className="bg-card shadow-sm border-border"
         />
       </div>
@@ -93,7 +93,7 @@ export function Dashboard() {
       <div className="grid gap-6 lg:grid-cols-7">
         <Card className="lg:col-span-4 border-border bg-card shadow-sm">
           <CardHeader className="border-b border-border">
-            <CardTitle>Platform Distribution</CardTitle>
+            <CardTitle>{t('dashboard.platformDistribution')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 pt-6">
             {platformSummaries.map(({ platform, count }) => {
@@ -108,7 +108,9 @@ export function Dashboard() {
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="font-medium text-foreground">{platform.name}</p>
-                      <p className="text-sm text-muted-foreground">{count} accounts</p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('dashboard.accountCount', { count })}
+                      </p>
                     </div>
                     <div className="text-sm font-semibold text-foreground">{ratio.toFixed(0)}%</div>
                   </div>
@@ -129,7 +131,7 @@ export function Dashboard() {
 
         <Card className="lg:col-span-3 border-border bg-card shadow-sm">
           <CardHeader className="border-b border-border">
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>{t('dashboard.recentActivity')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 pt-6">
             {recentAccounts.length === 0 ? (

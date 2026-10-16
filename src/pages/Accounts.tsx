@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
 import { getAllPlatforms, getPlatform } from '@/platforms/registry'
 import { usePlatformStore } from '@/stores/usePlatformStore'
@@ -7,9 +8,10 @@ import { cn } from '@/lib/utils'
 
 export function Accounts() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const { t } = useTranslation()
   const accounts = usePlatformStore((state) => state.accounts)
   const platforms = getAllPlatforms()
-  const selectedPlatformId = searchParams.get('platform') || getAllPlatforms()[0]?.id
+  const selectedPlatformId = searchParams.get('platform') || platforms[0]?.id
   const selectedPlatform = getPlatform(selectedPlatformId)
 
   const platformStats = useMemo(
@@ -22,7 +24,7 @@ export function Accounts() {
   )
 
   if (!selectedPlatform) {
-    return <div>Platform not found</div>
+    return <div>{t('accounts.platformNotFound')}</div>
   }
 
   const AccountListComponent = selectedPlatform.AccountList
@@ -33,12 +35,15 @@ export function Accounts() {
         <CardContent className="space-y-5 p-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Platform Workspace</p>
+              <p className="text-sm font-medium text-muted-foreground">{t('accounts.platformWorkspace')}</p>
               <h1 className="text-2xl font-bold tracking-tight">{selectedPlatform.name}</h1>
               <p className="max-w-3xl text-sm text-muted-foreground">{selectedPlatform.description}</p>
             </div>
             <div className="rounded-xl border border-border/60 bg-background/70 px-3 py-2 text-sm text-muted-foreground">
-              {platformStats.reduce((sum, item) => sum + item.count, 0)} accounts across {platforms.length} platforms
+              {t('accounts.accountsAcross', {
+                count: platformStats.reduce((sum, item) => sum + item.count, 0),
+                total: platforms.length,
+              })}
             </div>
           </div>
 
