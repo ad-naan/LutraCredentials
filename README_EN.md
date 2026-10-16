@@ -879,14 +879,14 @@ Thanks to these wonderful people who have contributed to this project:
 
 ### 📈 Project Stats
 
-![GitHub stars](https://img.shields.io/github/stars/adnaan-worker/nexus-account-manager?style=social)
-![GitHub forks](https://img.shields.io/github/forks/adnaan-worker/nexus-account-manager?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/adnaan-worker/nexus-account-manager?style=social)
+![GitHub stars](https://img.shields.io/github/stars/ad-naan/nexus-account-manager?style=social)
+![GitHub forks](https://img.shields.io/github/forks/ad-naan/nexus-account-manager?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/ad-naan/nexus-account-manager?style=social)
 
-![GitHub issues](https://img.shields.io/github/issues/adnaan-worker/nexus-account-manager?style=flat-square)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/adnaan-worker/nexus-account-manager?style=flat-square)
-![GitHub last commit](https://img.shields.io/github/last-commit/adnaan-worker/nexus-account-manager?style=flat-square)
-![GitHub contributors](https://img.shields.io/github/contributors/adnaan-worker/nexus-account-manager?style=flat-square)
+![GitHub issues](https://img.shields.io/github/issues/ad-naan/nexus-account-manager?style=flat-square)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/ad-naan/nexus-account-manager?style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/ad-naan/nexus-account-manager?style=flat-square)
+![GitHub contributors](https://img.shields.io/github/contributors/ad-naan/nexus-account-manager?style=flat-square)
 
 Want to see your name here? [Contribute to the project!](#-contributing)
 
@@ -960,7 +960,7 @@ This project stands on the shoulders of giants:
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=adnaan-worker/nexus-account-manager&type=Date)](https://star-history.com/#adnaan-worker/nexus-account-manager&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=ad-naan/nexus-account-manager&type=Date)](https://star-history.com/#ad-naan/nexus-account-manager&Date)
 
 ---
 
