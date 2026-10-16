@@ -29,8 +29,8 @@
 /* Brand mark: a full-height tile flush with the window corner. The PNG keeps its
    own transparent background, so nothing is painted behind the artwork. */
 .topbar-brand { display: flex; align-self: stretch; align-items: center; gap: 10px; padding-right: 16px; }
-.topbar-brand-plate { display: flex; align-self: stretch; width: 44px; flex: 0 0 44px; align-items: center; justify-content: center; }
-.topbar-brand-plate img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.topbar-brand-mark { display: flex; align-self: stretch; width: 44px; flex: 0 0 44px; align-items: center; justify-content: center; }
+.topbar-brand-mark img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .topbar-brand-name { color: hsl(var(--foreground)); font-size: 13px; font-weight: 600; letter-spacing: -.015em; white-space: nowrap; }
 .topbar-links { display: flex; align-items: center; gap: 2px; min-width: 0; }
 .topbar-link {

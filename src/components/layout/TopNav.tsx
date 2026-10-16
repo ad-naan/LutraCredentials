@@ -47,7 +47,7 @@ export function TopNav() {
   return (
     <header className="app-topbar" data-tauri-drag-region>
       <div className="topbar-brand" data-tauri-drag-region>
-        <span className="topbar-brand-plate">
+        <span className="topbar-brand-mark">
           <img src="/logo.png" alt="" aria-hidden="true" />
         </span>
         <span className="topbar-brand-name" data-tauri-drag-region>LutraCredentials</span>
