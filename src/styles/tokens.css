@@ -24,38 +24,39 @@
   --success: 166 43% 33%;
   --warning: 36 72% 38%;
   --radius: 0.625rem;
-  --nav-width: 184px;
-  --platform-width: 168px;
-  --page-padding: 24px;
+  --page-padding: 22px;
   --shadow-card: 0 1px 2px hsl(174 20% 16% / 0.035);
   --shadow-dialog: 0 20px 64px hsl(174 25% 9% / 0.2), 0 4px 12px hsl(174 25% 9% / 0.08);
   --workbench-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
 }
 
+/* Neutral graphite: the dark theme drops the brand hue completely, so surfaces,
+   borders and accents stay achromatic. The lake-green brand colour is reserved
+   for the light theme. */
 .dark {
   color-scheme: dark;
-  --background: 173 14% 9%;
-  --foreground: 164 14% 91%;
-  --card: 172 13% 13%;
-  --card-foreground: 164 14% 91%;
-  --popover: 172 13% 14%;
-  --popover-foreground: 164 14% 91%;
-  --primary: 164 37% 58%;
-  --primary-foreground: 173 32% 10%;
-  --secondary: 172 12% 19%;
-  --secondary-foreground: 164 14% 87%;
-  --muted: 172 12% 19%;
-  --muted-foreground: 168 9% 64%;
-  --accent: 172 24% 20%;
-  --accent-foreground: 164 38% 73%;
+  --background: 0 0% 9%;
+  --foreground: 0 0% 92%;
+  --card: 0 0% 13%;
+  --card-foreground: 0 0% 92%;
+  --popover: 0 0% 15%;
+  --popover-foreground: 0 0% 92%;
+  --primary: 0 0% 86%;
+  --primary-foreground: 0 0% 11%;
+  --secondary: 0 0% 20%;
+  --secondary-foreground: 0 0% 88%;
+  --muted: 0 0% 20%;
+  --muted-foreground: 0 0% 64%;
+  --accent: 0 0% 23%;
+  --accent-foreground: 0 0% 96%;
   --destructive: 0 65% 64%;
   --destructive-foreground: 0 0% 100%;
-  --border: 172 11% 24%;
-  --input: 172 11% 29%;
-  --ring: 164 37% 58%;
-  --sidebar: 174 15% 11%;
-  --success: 164 38% 61%;
+  --border: 0 0% 25%;
+  --input: 0 0% 30%;
+  --ring: 0 0% 72%;
+  --sidebar: 0 0% 11%;
+  --success: 0 0% 70%;
   --warning: 37 68% 62%;
-  --shadow-card: 0 1px 2px hsl(174 20% 3% / 0.15);
-  --shadow-dialog: 0 24px 72px hsl(174 25% 3% / 0.48), 0 4px 12px hsl(174 25% 3% / 0.2);
+  --shadow-card: 0 1px 2px hsl(0 0% 0% / 0.15);
+  --shadow-dialog: 0 24px 72px hsl(0 0% 0% / 0.48), 0 4px 12px hsl(0 0% 0% / 0.2);
 }

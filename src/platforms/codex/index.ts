@@ -1,5 +1,6 @@
 import { PlatformConfig } from '@/types/platform'
-import { Terminal, FileJson, KeyRound } from 'lucide-react'
+import { FileJson, KeyRound } from 'lucide-react'
+import { codexIcon } from '@/platforms/icons'
 import { CodexAccountList } from './components/AccountList'
 import { JsonMethod } from './methods/JsonMethod'
 import { OAuthMethod } from './methods/OAuthMethod'
@@ -7,7 +8,7 @@ import { OAuthMethod } from './methods/OAuthMethod'
 export const codexConfig: PlatformConfig = {
   id: 'codex',
   name: 'Codex',
-  icon: Terminal,
+  icon: codexIcon,
   color: '#10A37F',
   description: 'OpenAI Codex API Account Management',
 

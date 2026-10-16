@@ -1,12 +1,13 @@
 import { PlatformConfig } from '@/types/platform'
-import { Code2, Fingerprint, Users, Key } from 'lucide-react'
+import { Fingerprint, Users, Key } from 'lucide-react'
+import { kiroIcon } from '@/platforms/icons'
 import { KiroAccountList } from './components/AccountList'
 import { BuilderIdMethod, SocialMethod, TokenImportMethod } from './methods'
 
 export const kiroConfig: PlatformConfig = {
   id: 'kiro',
   name: 'Kiro IDE',
-  icon: Code2,
+  icon: kiroIcon,
   color: '#4F46E5',
   description: 'Kiro IDE Account Management',
 

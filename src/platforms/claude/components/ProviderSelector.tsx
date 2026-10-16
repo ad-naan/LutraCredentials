@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Star } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import {
   Dialog,
@@ -111,7 +112,9 @@ export function ProviderSelector({ open, onOpenChange, onSuccess }: ProviderSele
                     {groupedPresets.cn_official.map((preset) => (
                       <SelectItem key={preset.id} value={preset.id}>
                         {preset.name}
-                        {preset.isPartner && ' ⭐'}
+                        {preset.isPartner && (
+                          <Star className="ml-1.5 inline h-3 w-3 text-amber-500" aria-hidden="true" />
+                        )}
                       </SelectItem>
                     ))}
                   </SelectGroup>

@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { useDeferredValue, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { LucideIcon } from 'lucide-react'
+import type { PlatformIconComponent } from '@/platforms/icons'
 import {
   ArrowRight,
   CheckCircle2,
@@ -56,7 +57,7 @@ export interface ExternalPlatformDefinition {
   name: string
   description: string
   color: string
-  icon: LucideIcon
+  icon: PlatformIconComponent
   accountTypeLabel?: string
   importHint?: string
   placeholderJson?: string
@@ -1494,31 +1495,29 @@ function ExternalPlatformAccountList({ definition }: { definition: ExternalPlatf
   return (
     <div className="platform-account-list">
       <div className="platform-list-header">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="platform-list-title">{definition.name}</h1>
-            {versionsLoading ? (
+        <div className="platform-list-heading">
+          <h1 className="platform-list-title">{definition.name}</h1>
+          {versionsLoading ? (
+            <span className="rounded bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
+              {t('common.loading', { defaultValue: 'Loading...' })}
+            </span>
+          ) : version ? (
+            version.installed ? (
               <span className="rounded bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-                {t('common.loading', { defaultValue: 'Loading...' })}
+                {version.version
+                  ? `v${version.version}`
+                  : t('common.installed', { defaultValue: 'Installed' })}
               </span>
-            ) : version ? (
-              version.installed ? (
-                <span className="rounded bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-                  {version.version
-                    ? `v${version.version}`
-                    : t('common.installed', { defaultValue: 'Installed' })}
-                </span>
-              ) : (
-                <span className="rounded bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
-                  {t('common.notInstalled', { defaultValue: 'Not installed' })}
-                </span>
-              )
             ) : (
-              <span className="rounded bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-                {methods.length > 1 ? t('external.multipleMethods') : 'JSON'}
+              <span className="rounded bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
+                {t('common.notInstalled', { defaultValue: 'Not installed' })}
               </span>
-            )}
-          </div>
+            )
+          ) : (
+            <span className="rounded bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
+              {methods.length > 1 ? t('external.multipleMethods') : 'JSON'}
+            </span>
+          )}
           <p className="platform-list-description">
             {definition.description}
           </p>

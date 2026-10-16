@@ -139,31 +139,29 @@ export function CodexAccountList() {
   return (
     <div className="platform-account-list">
       <div className="platform-list-header">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="platform-list-title">
-              OpenAI Codex
-            </h1>
-            {versionsLoading ? (
-              <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded animate-pulse">
-                {t('common.loading') || 'Loading...'}
-              </span>
-            ) : codexVersion?.installed ? (
-              codexVersion.version ? (
-                <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded">
-                  v{codexVersion.version}
-                </span>
-              ) : null
-            ) : (
-              <span className="text-xs text-muted-foreground bg-destructive/10 text-destructive px-2 py-0.5 rounded">
-                {t('common.notInstalled')}
-              </span>
-            )}
-          </div>
-          <p className="platform-list-description">
-            {t('platforms.codex.description', 'Manage your OpenAI Codex API accounts')}
-          </p>
-        </div>
+        <div className="platform-list-heading">
+        <h1 className="platform-list-title">
+          OpenAI Codex
+        </h1>
+        {versionsLoading ? (
+          <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded animate-pulse">
+            {t('common.loading') || 'Loading...'}
+          </span>
+        ) : codexVersion?.installed ? (
+          codexVersion.version ? (
+            <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded">
+              v{codexVersion.version}
+            </span>
+          ) : null
+        ) : (
+          <span className="text-xs text-muted-foreground bg-destructive/10 text-destructive px-2 py-0.5 rounded">
+            {t('common.notInstalled')}
+          </span>
+        )}
+        <p className="platform-list-description">
+          {t('platforms.codex.description', 'Manage your OpenAI Codex API accounts')}
+        </p>
+      </div>
         <div className="platform-list-actions">
           {codexAccounts.length > 0 && (
             <>

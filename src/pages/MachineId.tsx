@@ -179,7 +179,7 @@ export function MachineId() {
   return (
     <div className="page-stack machine-page">
       {/* 页面标题 */}
-      <div>
+      <div className="page-heading">
         <h2 className="page-title">
           {t('machineId.title', 'Machine ID Management')}
         </h2>

@@ -311,7 +311,7 @@ export function Settings() {
 
   return (
     <div className="page-stack settings-page">
-      <div>
+      <div className="page-heading">
         <h1 className="page-title">
           {t('settings.title')}
         </h1>

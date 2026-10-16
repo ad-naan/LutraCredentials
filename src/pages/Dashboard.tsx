@@ -42,8 +42,7 @@ export function Dashboard() {
   return (
     <div className="page-stack">
       <header className="page-header">
-        <div>
-          <p className="page-eyebrow">{t('workbench.overview')}</p>
+        <div className="page-heading">
           <h1 className="page-title">{t('dashboard.title')}</h1>
           <p className="page-description">{t('dashboard.subtitle')}</p>
         </div>
@@ -63,103 +62,102 @@ export function Dashboard() {
         ))}
       </div>
 
+      <section className="surface">
+        <div className="surface-heading">
+          <h2 className="surface-title">{t('dashboard.platformsTitle')}</h2>
+          <span className="surface-caption">{t('workbench.platformCount', { count: platforms.length })}</span>
+        </div>
+        <div className="platform-directory">
+          {platformSummaries.map(({ platform, count }) => {
+            const Icon = platform.icon
+            const version = versionMap.get(platform.id)
+            return (
+              <button
+                key={platform.id}
+                type="button"
+                className="platform-directory-row"
+                onClick={() => navigate(`/accounts?platform=${platform.id}`)}
+              >
+                <span className="platform-mark"><Icon /></span>
+                <div className="platform-directory-info">
+                  <p className="platform-directory-name">{platform.name}</p>
+                  <p className="platform-directory-detail">
+                    {versionsLoading ? t('common.loading') : version ? (
+                      version.installed
+                        ? version.version ? `v${version.version}` : t('common.installed')
+                        : t('common.notInstalled')
+                    ) : t('workbench.configuration')}
+                  </p>
+                </div>
+                <span className="platform-directory-count" aria-label={t('dashboard.accountCount', { count })}>
+                  {count}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </section>
+
       <div className="dashboard-columns">
         <section className="surface">
           <div className="surface-heading">
-            <h2 className="surface-title">{t('dashboard.platformsTitle')}</h2>
-            <span className="surface-caption">{t('workbench.platformCount', { count: platforms.length })}</span>
+            <h2 className="surface-title">{t('dashboard.recentActivity')}</h2>
+            <Clock3 className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
           </div>
-          <div className="platform-directory">
-            {platformSummaries.map(({ platform, count }) => {
-              const Icon = platform.icon
-              const version = versionMap.get(platform.id)
-              return (
-                <button
-                  key={platform.id}
-                  type="button"
-                  className="platform-directory-row"
-                  onClick={() => navigate(`/accounts?platform=${platform.id}`)}
-                >
-                  <span className="platform-mark"><Icon aria-hidden="true" /></span>
-                  <div className="platform-directory-info">
-                    <p className="platform-directory-name">{platform.name}</p>
-                    <p className="platform-directory-detail">
-                      {versionsLoading ? t('common.loading') : version ? (
-                        version.installed
-                          ? version.version ? `v${version.version}` : t('common.installed')
-                          : t('common.notInstalled')
-                      ) : t('workbench.configuration')}
-                    </p>
-                  </div>
-                  <span className="platform-directory-count" aria-label={t('dashboard.accountCount', { count })}>
-                    {count}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
+          {recentAccounts.length ? (
+            <div className="recent-list">
+              {recentAccounts.map((account) => {
+                const platform = platforms.find((item) => item.id === account.platform)
+                const Icon = platform?.icon || Users
+                return (
+                  <button
+                    key={account.id}
+                    type="button"
+                    className="recent-row"
+                    onClick={() => navigate(`/accounts?platform=${account.platform}`)}
+                  >
+                    <span className="platform-mark"><Icon /></span>
+                    <div className="platform-directory-info">
+                      <p className="recent-account" title={account.email}>{account.email}</p>
+                      <p className="platform-directory-detail">{platform?.name || account.platform}</p>
+                    </div>
+                    <time className="recent-date">
+                      {account.lastUsedAt ? new Date(account.lastUsedAt).toLocaleDateString(i18n.resolvedLanguage || i18n.language) : '—'}
+                    </time>
+                  </button>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="recent-empty">
+              <Users aria-hidden="true" />
+              <p>{t('accounts.noAccounts')}</p>
+              <Button variant="outline" size="sm" onClick={() => navigate('/accounts')}>
+                {t('dashboard.manageAccounts')}<ArrowRight aria-hidden="true" />
+              </Button>
+            </div>
+          )}
         </section>
 
-        <div className="page-stack">
-          <section className="surface">
-            <div className="surface-heading">
-              <h2 className="surface-title">{t('dashboard.recentActivity')}</h2>
-              <Clock3 className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
-            </div>
-            {recentAccounts.length ? (
-              <div className="recent-list">
-                {recentAccounts.map((account) => {
-                  const platform = platforms.find((item) => item.id === account.platform)
-                  const Icon = platform?.icon || Users
-                  return (
-                    <button
-                      key={account.id}
-                      type="button"
-                      className="recent-row"
-                      onClick={() => navigate(`/accounts?platform=${account.platform}`)}
-                    >
-                      <span className="platform-mark"><Icon aria-hidden="true" /></span>
-                      <div className="platform-directory-info">
-                        <p className="recent-account" title={account.email}>{account.email}</p>
-                        <p className="platform-directory-detail">{platform?.name || account.platform}</p>
-                      </div>
-                      <time className="recent-date">
-                        {account.lastUsedAt ? new Date(account.lastUsedAt).toLocaleDateString(i18n.resolvedLanguage || i18n.language) : '—'}
-                      </time>
-                    </button>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="recent-empty">
-                <Users aria-hidden="true" />
-                <p>{t('accounts.noAccounts')}</p>
-                <Button variant="outline" size="sm" onClick={() => navigate('/accounts')}>
-                  {t('dashboard.manageAccounts')}<ArrowRight aria-hidden="true" />
-                </Button>
-              </div>
-            )}
-          </section>
-
-          <section className="surface">
-            <div className="surface-heading"><h2 className="surface-title">{t('dashboard.platformDistribution')}</h2></div>
-            <div className="distribution-list">
-              {distribution.length ? distribution.map(({ platform, count }) => (
-                <button
-                  type="button"
-                  key={platform.id}
-                  className="distribution-row"
-                  onClick={() => navigate(`/accounts?platform=${platform.id}`)}
-                >
-                  <span className="truncate">{platform.name}</span>
-                  <span className="distribution-bar"><span style={{ width: `${(count / accounts.length) * 100}%` }} /></span>
-                  <span className="text-right tabular-nums text-muted-foreground">{count}</span>
-                </button>
-              )) : <p className="surface-caption">{t('workbench.noDistribution')}</p>}
-            </div>
-          </section>
-        </div>
+        <section className="surface">
+          <div className="surface-heading"><h2 className="surface-title">{t('dashboard.platformDistribution')}</h2></div>
+          <div className="distribution-list">
+            {distribution.length ? distribution.map(({ platform, count }) => (
+              <button
+                type="button"
+                key={platform.id}
+                className="distribution-row"
+                onClick={() => navigate(`/accounts?platform=${platform.id}`)}
+              >
+                <span className="truncate">{platform.name}</span>
+                <span className="distribution-bar"><span style={{ width: `${(count / accounts.length) * 100}%` }} /></span>
+                <span className="text-right tabular-nums text-muted-foreground">{count}</span>
+              </button>
+            )) : <p className="surface-caption">{t('workbench.noDistribution')}</p>}
+          </div>
+        </section>
       </div>
     </div>
   )
 }
+

@@ -1,12 +1,13 @@
 import { PlatformConfig } from '@/types/platform'
-import { Sparkles, FileJson } from 'lucide-react'
+import { FileJson } from 'lucide-react'
+import { geminiIcon } from '@/platforms/icons'
 import { GeminiAccountList } from './components/AccountList'
 import { JsonMethod } from './methods/JsonMethod'
 
 export const geminiConfig: PlatformConfig = {
   id: 'gemini',
   name: 'Gemini',
-  icon: Sparkles,
+  icon: geminiIcon,
   color: '#4285F4',
   description: 'Google Gemini API Account Management',
 

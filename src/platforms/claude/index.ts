@@ -1,12 +1,13 @@
 import { PlatformConfig } from '@/types/platform'
-import { Asterisk, FileJson, KeyRound } from 'lucide-react'
+import { FileJson, KeyRound } from 'lucide-react'
+import { claudeIcon } from '@/platforms/icons'
 import { ClaudeAccountList } from './components/AccountList'
 import { JsonMethod, OAuthMethod } from './methods'
 
 export const claudeConfig: PlatformConfig = {
   id: 'claude',
   name: 'Claude',
-  icon: Asterisk,
+  icon: claudeIcon,
   color: '#4F46E5',
   description: 'Claude API Account Management',
 

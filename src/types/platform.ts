@@ -1,5 +1,6 @@
 import { LucideIcon } from 'lucide-react'
 import { Account } from './account'
+import { PlatformIconComponent } from '@/platforms/icons'
 import { ComponentType, ReactNode } from 'react'
 
 export type { Account } from './account'
@@ -63,7 +64,7 @@ export interface PlatformFeatures {
 export interface PlatformConfig {
   id: string
   name: string
-  icon: LucideIcon
+  icon: PlatformIconComponent
   color: string
   description: string
 

@@ -47,27 +47,25 @@ export function AntigravityAccountList() {
   return (
     <div className="platform-account-list">
       <div className="platform-list-header">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="platform-list-title">
-              {t('platforms.antigravity.name')}
-            </h1>
-            {versionsLoading ? (
-              <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded animate-pulse">
-                {t('common.loading') || 'Loading...'}
+        <div className="platform-list-heading">
+          <h1 className="platform-list-title">
+            {t('platforms.antigravity.name')}
+          </h1>
+          {versionsLoading ? (
+            <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded animate-pulse">
+              {t('common.loading') || 'Loading...'}
+            </span>
+          ) : antigravityVersion?.installed ? (
+            antigravityVersion.version ? (
+              <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded">
+                v{antigravityVersion.version}
               </span>
-            ) : antigravityVersion?.installed ? (
-              antigravityVersion.version ? (
-                <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded">
-                  v{antigravityVersion.version}
-                </span>
-              ) : null
-            ) : (
-              <span className="text-xs text-muted-foreground bg-destructive/10 text-destructive px-2 py-0.5 rounded">
-                {t('common.notInstalled')}
-              </span>
-            )}
-          </div>
+            ) : null
+          ) : (
+            <span className="text-xs text-muted-foreground bg-destructive/10 text-destructive px-2 py-0.5 rounded">
+              {t('common.notInstalled')}
+            </span>
+          )}
           <p className="platform-list-description">
             {t('platforms.antigravity.description', 'Manage your Google/Anthropic AI service accounts')}
           </p>

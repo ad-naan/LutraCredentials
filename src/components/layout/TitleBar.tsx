@@ -18,7 +18,13 @@ export function TitleBar() {
       className="app-titlebar"
       data-tauri-drag-region
     >
-      <span className="titlebar-label" data-tauri-drag-region>LutraCredentials</span>
+      <div className="titlebar-brand" data-tauri-drag-region>
+        <img src="/logo.png" alt="" aria-hidden="true" />
+        <div className="titlebar-brand-text" data-tauri-drag-region>
+          <span className="titlebar-name" data-tauri-drag-region>LutraCredentials</span>
+          <span className="titlebar-caption" data-tauri-drag-region>AI ACCOUNT VAULT</span>
+        </div>
+      </div>
       {/* Window Controls (Windows Style but minimal) */}
       <div className="flex items-center gap-1">
         <Button

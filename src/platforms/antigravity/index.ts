@@ -1,12 +1,13 @@
 import { PlatformConfig } from '@/types/platform'
-import { Zap, Globe, Key, Database } from 'lucide-react'
+import { Globe, Key, Database } from 'lucide-react'
+import { antigravityIcon } from '@/platforms/icons'
 import { AntigravityAccountList } from './components/AccountList'
 import { OAuthMethod, TokenMethod, ImportMethod } from './methods'
 
 export const antigravityConfig: PlatformConfig = {
   id: 'antigravity',
   name: 'Antigravity',
-  icon: Zap,
+  icon: antigravityIcon,
   color: '#FF6B35',
   description: 'Google/Anthropic AI Services Management',
 

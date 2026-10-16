@@ -1,23 +1,23 @@
+import { CheckCircle2 } from 'lucide-react'
 import {
-  Bot,
-  BotMessageSquare,
-  Braces,
-  CheckCircle2,
-  CodeXml,
-  Crosshair,
-  Github,
-  Send,
-  Sparkles,
-  Wind,
-  Workflow,
-} from 'lucide-react'
+  codebuddyIcon,
+  copilotIcon,
+  cursorIcon,
+  grokIcon,
+  qoderIcon,
+  traeIcon,
+  windsurfIcon,
+  workbuddyIcon,
+  zcodeIcon,
+  zedIcon,
+} from '@/platforms/icons'
 import { createExternalPlatformConfig } from '@/platforms/shared/externalPlatform'
 
 export const externalPlatformConfigs = [
   createExternalPlatformConfig({
     id: 'github-copilot',
     name: 'GitHub Copilot',
-    icon: Github,
+    icon: copilotIcon,
     color: '#24292F',
     description: 'Manage GitHub Copilot accounts with JSON import and local VS Code session import.',
     accountTypeLabel: 'Copilot',
@@ -36,7 +36,7 @@ export const externalPlatformConfigs = [
   createExternalPlatformConfig({
     id: 'windsurf',
     name: 'Windsurf',
-    icon: Wind,
+    icon: windsurfIcon,
     color: '#0EA5E9',
     description: 'Manage Windsurf accounts with JSON import and local state import.',
     accountTypeLabel: 'Windsurf',
@@ -56,7 +56,7 @@ export const externalPlatformConfigs = [
   createExternalPlatformConfig({
     id: 'cursor',
     name: 'Cursor',
-    icon: Crosshair,
+    icon: cursorIcon,
     color: '#2563EB',
     description: 'Manage Cursor accounts with JSON import, local state import, and one-click switching.',
     accountTypeLabel: 'Cursor',
@@ -78,7 +78,7 @@ export const externalPlatformConfigs = [
   createExternalPlatformConfig({
     id: 'codebuddy',
     name: 'CodeBuddy',
-    icon: Bot,
+    icon: codebuddyIcon,
     color: '#F97316',
     description: 'Manage CodeBuddy accounts with token import, local session import, and one-click switching.',
     accountTypeLabel: 'CodeBuddy',
@@ -98,7 +98,7 @@ export const externalPlatformConfigs = [
   createExternalPlatformConfig({
     id: 'codebuddy_cn',
     name: 'CodeBuddy CN',
-    icon: BotMessageSquare,
+    icon: codebuddyIcon,
     color: '#DC2626',
     description: 'Manage CodeBuddy CN accounts with token import, local session import, and one-click switching.',
     accountTypeLabel: 'CodeBuddy CN',
@@ -129,7 +129,7 @@ export const externalPlatformConfigs = [
   createExternalPlatformConfig({
     id: 'qoder',
     name: 'Qoder',
-    icon: Braces,
+    icon: qoderIcon,
     color: '#7C3AED',
     description: 'Manage Qoder accounts with JSON import, local state import, and one-click switching.',
     accountTypeLabel: 'Qoder',
@@ -145,7 +145,7 @@ export const externalPlatformConfigs = [
   createExternalPlatformConfig({
     id: 'trae',
     name: 'Trae',
-    icon: Send,
+    icon: traeIcon,
     color: '#14B8A6',
     description: 'Manage Trae accounts with token import, local storage import, and one-click switching.',
     accountTypeLabel: 'Trae',
@@ -160,7 +160,7 @@ export const externalPlatformConfigs = [
   createExternalPlatformConfig({
     id: 'zed',
     name: 'Zed',
-    icon: Workflow,
+    icon: zedIcon,
     color: '#111827',
     description: 'Manage Zed accounts with JSON import, local macOS Keychain import, and one-click switching.',
     accountTypeLabel: 'Zed',
@@ -178,7 +178,7 @@ export const externalPlatformConfigs = [
   createExternalPlatformConfig({
     id: 'grok',
     name: 'Grok',
-    icon: Sparkles,
+    icon: grokIcon,
     color: '#0F172A',
     description: 'Manage Grok (xAI) CLI accounts with OAuth, local auth.json import, and one-click switching.',
     accountTypeLabel: 'Grok',
@@ -209,7 +209,7 @@ export const externalPlatformConfigs = [
   createExternalPlatformConfig({
     id: 'zcode',
     name: 'Zcode',
-    icon: CodeXml,
+    icon: zcodeIcon,
     color: '#3B82F6',
     description: 'Manage Zcode (GLM coding plan) accounts with OAuth, API key import, and one-click switching.',
     accountTypeLabel: 'Zcode',
@@ -240,7 +240,7 @@ export const externalPlatformConfigs = [
   createExternalPlatformConfig({
     id: 'workbuddy',
     name: 'WorkBuddy',
-    icon: Bot,
+    icon: workbuddyIcon,
     color: '#0891B2',
     description: 'Manage WorkBuddy accounts with token import, local session import, and one-click switching.',
     accountTypeLabel: 'WorkBuddy',
