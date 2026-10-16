@@ -6,7 +6,8 @@
         "dashboard": "Dashboard",
         "accounts": "Accounts",
         "machineId": "Machine ID",
-        "settings": "Settings"
+        "settings": "Settings",
+        "data": "Data & Paths"
     },
     "workbench": {
         "workspace": "WORKSPACE",
@@ -388,6 +389,47 @@
         "autoRefreshMinutes": "{{count}} min",
         "autoRefreshSaved": "Auto refresh settings updated"
     },
+    "data": {
+        "title": "Data & Paths",
+        "subtitle": "Manage data storage, backup & restore, runtime logs and local platform paths",
+        "localPathsTitle": "Local App & State Paths",
+        "localPathsDesc": "Manage local executable and state database paths with auto-detection, browsing and manual configuration.",
+        "pathStatusConfigured": "Configured",
+        "pathStatusAutoDetected": "Auto-detected",
+        "pathStatusNotConfigured": "Not configured",
+        "kindExecutable": "Executable",
+        "kindStorage": "State file",
+        "kindDatabase": "State database",
+        "pathSelectDone": "Path selected. Click Save to apply",
+        "pathSelectFailed": "Failed to select path",
+        "pathDetected": "Path detected. Click Save to pin it",
+        "pathDetectNone": "No path detected. Select or enter it manually",
+        "pathDetectFailed": "Failed to detect path",
+        "pathSaved": "{{name}} path saved",
+        "pathSaveFailed": "Failed to save path",
+        "pathClearedDetected": "Manual configuration cleared. The auto-detected path will be used",
+        "pathCleared": "Manual configuration cleared",
+        "pathClearFailed": "Failed to reset path",
+        "detectInstall": "Detect Install",
+        "configuredPath": "Configured",
+        "detectedPath": "Detected",
+        "effectivePath": "Effective",
+        "notSet": "Not set",
+        "notDetected": "Not detected",
+        "none": "None",
+        "pathDescDefault": "Manage local path configuration.",
+        "pathDescriptions": {
+            "antigravity": "Manage the Antigravity executable path with auto-detection, browsing and manual entry.",
+            "cursor": "Manage the local Cursor state.vscdb path for local import and one-click account switching.",
+            "windsurf": "Manage the local Windsurf state.vscdb path to read the current login state.",
+            "github-copilot": "Manage the VS Code state.vscdb path used by GitHub Copilot for local session import.",
+            "codebuddy": "Manage the local CodeBuddy state.vscdb path for session import and one-click switching.",
+            "codebuddy_cn": "Manage the local CodeBuddy CN state.vscdb path for session import and one-click switching.",
+            "workbuddy": "Manage the local WorkBuddy state.vscdb path for session import and one-click switching.",
+            "qoder": "Manage the local Qoder state.vscdb path to read and write the current login state.",
+            "trae": "Manage the local Trae storage.json path with scanning, manual configuration and one-click switching."
+        }
+    },
     "export": {
         "title": "Export Accounts",
         "selected": "{{count}} selected",
@@ -458,7 +500,8 @@
         "recentTrend": "Request Trend (14 days)",
         "topModels": "Top Models",
         "scanning": "Scanning sessions...",
-        "noData": "No usage data yet"
+        "noData": "No usage data yet",
+        "peak": "Peak {{count}}"
     },
     "proxy": {
         "title": "Local Routing Proxy",

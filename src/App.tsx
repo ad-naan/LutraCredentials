@@ -5,6 +5,7 @@ import { Dashboard } from './pages/Dashboard'
 import { Accounts } from './pages/Accounts'
 import { MachineId } from './pages/MachineId'
 import { Settings } from './pages/Settings'
+import { Data } from './pages/Data'
 import { ThemeManager } from './components/common/ThemeManager'
 import { useEffect } from 'react'
 import { usePlatformStore } from './stores/usePlatformStore'
@@ -51,6 +52,7 @@ function App() {
             <Route path="accounts" element={<Accounts />} />
             <Route path="machine-id" element={<MachineId />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="data" element={<Data />} />
           </Route>
         </Routes>
         <Toaster />

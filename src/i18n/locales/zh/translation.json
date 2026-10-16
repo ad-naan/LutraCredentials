@@ -6,7 +6,8 @@
         "dashboard": "仪表盘",
         "accounts": "账号管理",
         "machineId": "机器码管理",
-        "settings": "设置"
+        "settings": "设置",
+        "data": "数据与路径"
     },
     "workbench": {
         "workspace": "工作空间",
@@ -388,6 +389,47 @@
         "autoRefreshMinutes": "{{count}} 分钟",
         "autoRefreshSaved": "已更新自动刷新设置"
     },
+    "data": {
+        "title": "数据与路径",
+        "subtitle": "管理数据存储、备份恢复、运行日志与本地平台路径",
+        "localPathsTitle": "本地软件与状态路径",
+        "localPathsDesc": "统一管理本地软件可执行文件和状态数据库路径，支持自动检测、浏览和手动配置。",
+        "pathStatusConfigured": "已配置",
+        "pathStatusAutoDetected": "已自动检测",
+        "pathStatusNotConfigured": "未配置",
+        "kindExecutable": "可执行文件",
+        "kindStorage": "状态文件",
+        "kindDatabase": "状态数据库",
+        "pathSelectDone": "已选择路径，点击保存后生效",
+        "pathSelectFailed": "选择路径失败",
+        "pathDetected": "已检测到路径，如需固定使用请点击保存",
+        "pathDetectNone": "未检测到路径，请手动选择或填写",
+        "pathDetectFailed": "检测路径失败",
+        "pathSaved": "{{name}} 路径已保存",
+        "pathSaveFailed": "保存路径失败",
+        "pathClearedDetected": "已清除手动配置，当前将使用自动检测路径",
+        "pathCleared": "已清除手动配置路径",
+        "pathClearFailed": "重置路径失败",
+        "detectInstall": "检测安装",
+        "configuredPath": "配置路径",
+        "detectedPath": "检测路径",
+        "effectivePath": "生效路径",
+        "notSet": "未设置",
+        "notDetected": "未检测到",
+        "none": "暂无",
+        "pathDescDefault": "管理本地路径配置。",
+        "pathDescriptions": {
+            "antigravity": "管理 Antigravity 可执行文件路径，支持自动检测、浏览选择和手动填写。",
+            "cursor": "管理 Cursor 本地 state.vscdb 路径，便于本地导入和一键切换账号。",
+            "windsurf": "管理 Windsurf 本地 state.vscdb 路径，便于读取当前登录状态。",
+            "github-copilot": "管理 GitHub Copilot 对应的 VS Code 本地 state.vscdb 路径，便于导入本地会话。",
+            "codebuddy": "管理 CodeBuddy 本地 state.vscdb 路径，支持本地会话导入和一键切换账号。",
+            "codebuddy_cn": "管理 CodeBuddy CN 本地 state.vscdb 路径，支持本地会话导入和一键切换账号。",
+            "workbuddy": "管理 WorkBuddy 本地 state.vscdb 路径，支持本地会话导入和一键切换账号。",
+            "qoder": "管理 Qoder 本地 state.vscdb 路径，便于读取和回写当前登录状态。",
+            "trae": "管理 Trae 本地 storage.json 路径，支持扫描、手动配置和一键切换账号。"
+        }
+    },
     "export": {
         "title": "导出账号",
         "selected": "{{count}} 个选中",
@@ -457,7 +499,8 @@
         "recentTrend": "近14天请求趋势",
         "topModels": "常用模型",
         "scanning": "正在扫描会话...",
-        "noData": "暂无用量数据"
+        "noData": "暂无用量数据",
+        "peak": "峰值 {{count}}"
     },
     "proxy": {
         "title": "本地路由代理",

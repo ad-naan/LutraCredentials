@@ -42,82 +42,94 @@ export function UsageWidget() {
     return Math.max(1, ...recentDays.map(([, d]) => d.requests))
   }, [recentDays])
 
+  const maxModelRequests = useMemo(() => {
+    return Math.max(1, ...topModels.map(([, u]) => u.requests))
+  }, [topModels])
+
   return (
     <section className="surface">
       <div className="surface-heading">
         <h2 className="surface-title">{t('usage.title')}</h2>
-        <Button variant="ghost" size="sm" onClick={scan} disabled={loading}>
+        <Button variant="ghost" size="sm" onClick={scan} disabled={loading} aria-label={t('common.refresh')}>
           {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
         </Button>
       </div>
 
       {data && !loading ? (
-        <div className="space-y-4">
-          {/* 指标卡片 */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div className="rounded-lg border p-3">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Activity className="h-3 w-3" />
+        <div className="usage-body">
+          <div className="usage-stats">
+            <div className="usage-stat">
+              <div className="usage-stat-label">
+                <Activity aria-hidden="true" />
                 {t('usage.totalRequests')}
               </div>
-              <div className="mt-1 text-xl font-semibold tabular-nums">{data.total_requests}</div>
+              <div className="usage-stat-value">{data.total_requests}</div>
             </div>
-            <div className="rounded-lg border p-3">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Cpu className="h-3 w-3" />
+            <div className="usage-stat">
+              <div className="usage-stat-label">
+                <Cpu aria-hidden="true" />
                 {t('usage.totalTokens')}
               </div>
-              <div className="mt-1 text-xl font-semibold tabular-nums">
+              <div className="usage-stat-value">
                 {formatTokens(data.total_input_tokens + data.total_output_tokens)}
               </div>
             </div>
-            <div className="rounded-lg border p-3">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <TrendingUp className="h-3 w-3" />
+            <div className="usage-stat">
+              <div className="usage-stat-label">
+                <TrendingUp aria-hidden="true" />
                 {t('usage.cacheHitRate')}
               </div>
-              <div className="mt-1 text-xl font-semibold tabular-nums">
+              <div className="usage-stat-value">
                 {data.total_input_tokens + data.total_cache_read_tokens > 0
                   ? `${((data.total_cache_read_tokens / (data.total_input_tokens + data.total_cache_read_tokens)) * 100).toFixed(0)}%`
                   : '—'}
               </div>
             </div>
-            <div className="rounded-lg border p-3">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Coins className="h-3 w-3" />
+            <div className="usage-stat">
+              <div className="usage-stat-label">
+                <Coins aria-hidden="true" />
                 {t('usage.estimatedCost')}
               </div>
-              <div className="mt-1 text-xl font-semibold tabular-nums">{formatCost(data.estimated_cost_usd)}</div>
+              <div className="usage-stat-value">{formatCost(data.estimated_cost_usd)}</div>
             </div>
           </div>
 
-          {/* 近14天趋势 */}
           {recentDays.length > 0 && (
-            <div>
-              <p className="mb-2 text-xs text-muted-foreground">{t('usage.recentTrend')}</p>
-              <div className="flex items-end gap-1" style={{ height: '60px' }}>
+            <div className="usage-section">
+              <div className="usage-section-heading">
+                <span className="usage-section-title">{t('usage.recentTrend')}</span>
+                <span className="usage-section-meta">{t('usage.peak', { count: maxDailyRequests })}</span>
+              </div>
+              <div className="usage-trend">
                 {recentDays.map(([date, d]) => (
                   <div
                     key={date}
-                    className="flex-1 rounded-t-sm bg-primary/20 transition-colors hover:bg-primary/40"
-                    style={{ height: `${(d.requests / maxDailyRequests) * 100}%` }}
-                    title={`${date}: ${d.requests} 请求`}
+                    className="usage-trend-bar"
+                    style={{ height: `${Math.max(4, (d.requests / maxDailyRequests) * 100)}%` }}
+                    title={`${date}: ${d.requests}`}
                   />
                 ))}
               </div>
             </div>
           )}
 
-          {/* Top 模型 */}
           {topModels.length > 0 && (
-            <div>
-              <p className="mb-2 text-xs text-muted-foreground">{t('usage.topModels')}</p>
-              <div className="space-y-1.5">
-                {topModels.map(([model, u]) => (
-                  <div key={model} className="flex items-center justify-between text-sm">
-                    <span className="truncate font-mono text-xs">{model}</span>
-                    <span className="ml-2 shrink-0 text-muted-foreground tabular-nums">
-                      {u.requests} 次 · {formatCost(u.estimated_cost)}
+            <div className="usage-section">
+              <div className="usage-section-heading">
+                <span className="usage-section-title">{t('usage.topModels')}</span>
+              </div>
+              <div className="usage-models">
+                {topModels.map(([model, u], index) => (
+                  <div key={model} className="usage-model-row">
+                    <span className="usage-model-rank">{index + 1}</span>
+                    <span className="usage-model-name" title={model}>{model}</span>
+                    <span className="usage-model-detail">
+                      <span className="usage-model-count">
+                        <strong>{u.requests}</strong> · {formatCost(u.estimated_cost)}
+                      </span>
+                      <span className="usage-model-bar">
+                        <span style={{ width: `${(u.requests / maxModelRequests) * 100}%` }} />
+                      </span>
                     </span>
                   </div>
                 ))}

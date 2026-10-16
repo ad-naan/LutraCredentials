@@ -32,9 +32,15 @@
 .topbar-brand-mark { display: flex; align-self: stretch; width: 44px; flex: 0 0 44px; align-items: center; justify-content: center; }
 .topbar-brand-mark img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .topbar-brand-name { color: hsl(var(--foreground)); font-size: 13px; font-weight: 600; letter-spacing: -.015em; white-space: nowrap; }
-.topbar-links { display: flex; align-items: center; gap: 2px; min-width: 0; }
+/* Navigation strip scrolls horizontally instead of overflowing into the
+   right-side utilities when the window gets narrow. The scrollbar stays hidden
+   (pointer/touch drag, wheel and scroll-snap still work). */
+.topbar-links { display: flex; align-items: center; gap: 2px; min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: none; }
+.topbar-links::-webkit-scrollbar { display: none; }
 .topbar-link {
   display: inline-flex;
+  flex-shrink: 0;
+  scroll-snap-align: start;
   height: 30px;
   align-items: center;
   gap: 7px;
@@ -60,6 +66,10 @@
   font-size: 10px;
   font-variant-numeric: tabular-nums;
 }
+/* Clickable version badge (update menu trigger): plain button reset + hover cue. */
+.topbar-version--button { height: 24px; border: 0; background: none; border-radius: 5px; cursor: pointer; font: inherit; transition: background-color .15s, color .15s; }
+.topbar-version--button:hover { background: hsl(var(--muted)); color: hsl(var(--foreground)); }
+.topbar-version--button:focus-visible { outline: 2px solid hsl(var(--primary) / .5); outline-offset: 1px; }
 .topbar-controls { display: flex; align-items: stretch; align-self: stretch; margin-left: 4px; border-left: 1px solid hsl(var(--border)); }
 
 .app-main { flex: 1; min-height: 0; min-width: 0; overflow-y: auto; padding: var(--page-padding); }
@@ -104,6 +114,32 @@
 .distribution-row { display: grid; grid-template-columns: minmax(0, 1fr) 80px 28px; align-items: center; gap: 10px; font-size: 11px; text-align: left; }
 .distribution-bar { height: 4px; overflow: hidden; border-radius: 4px; background: hsl(var(--muted)); }
 .distribution-bar span { display: block; height: 100%; border-radius: inherit; background: hsl(var(--primary)); }
+
+/* Usage widget: compact stat tiles, a daily bar trend and a ranked model list,
+   all following the same 10–13px type scale as the rest of the workbench. */
+.usage-body { display: flex; flex-direction: column; gap: 18px; padding: 14px 16px 18px; }
+.usage-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.usage-stat { min-width: 0; padding: 10px 12px; border: 1px solid hsl(var(--border)); border-radius: 8px; background: hsl(var(--background) / 40%); }
+.usage-stat-label { display: flex; align-items: center; gap: 6px; color: hsl(var(--muted-foreground)); font-size: 11px; white-space: nowrap; }
+.usage-stat-label svg { width: 12px; height: 12px; color: hsl(var(--primary)); }
+.usage-stat-value { margin-top: 4px; font-size: 20px; font-weight: 600; line-height: 1.2; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.usage-section { display: flex; flex-direction: column; gap: 8px; }
+.usage-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.usage-section-title { color: hsl(var(--muted-foreground)); font-size: 11px; font-weight: 550; text-transform: uppercase; letter-spacing: .04em; }
+.usage-section-meta { color: hsl(var(--muted-foreground)); font-size: 10px; font-variant-numeric: tabular-nums; }
+.usage-trend { display: flex; align-items: flex-end; gap: 3px; height: 72px; padding: 0 1px 5px; border-bottom: 1px solid hsl(var(--border)); }
+.usage-trend-bar { flex: 1; min-width: 4px; border-radius: 3px 3px 0 0; background: hsl(var(--primary) / 65%); transition: background-color .15s, transform .15s; cursor: default; }
+.usage-trend-bar:hover { background: hsl(var(--primary)); }
+.usage-models { display: flex; flex-direction: column; }
+.usage-model-row { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid hsl(var(--border)); font-size: 11px; }
+.usage-model-row:last-child { border-bottom: 0; }
+.usage-model-rank { color: hsl(var(--muted-foreground)); font-size: 10px; font-variant-numeric: tabular-nums; text-align: center; }
+.usage-model-name { overflow: hidden; min-width: 0; color: hsl(var(--foreground)); font-family: var(--font-mono, ui-monospace, monospace); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.usage-model-detail { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.usage-model-count { color: hsl(var(--foreground) / 85%); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.usage-model-count strong { font-weight: 600; }
+.usage-model-bar { width: 72px; height: 3px; overflow: hidden; border-radius: 3px; background: hsl(var(--muted)); }
+.usage-model-bar span { display: block; height: 100%; border-radius: inherit; background: hsl(var(--primary)); }
 
 /* ---------------------------------------------------------------------------
    Platform rail: a slim single-line label above an even chip grid, so the
@@ -198,6 +234,7 @@
   .topbar-link-label { display: none; }
   .topbar-link { padding: 0 9px; }
   .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .usage-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
   .topbar-brand-name { display: none; }

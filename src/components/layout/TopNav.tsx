@@ -1,5 +1,7 @@
+import type { WheelEvent } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
+  Database,
   Fingerprint,
   Globe,
   Home,
@@ -16,7 +18,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useTheme } from '@/hooks/useTheme'
 import { useTranslation } from 'react-i18next'
-import packageJson from '../../../package.json'
+import { VersionMenu } from '@/components/common/VersionMenu'
 
 const isTauriRuntime = () =>
   typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
@@ -38,10 +40,21 @@ export function TopNav() {
     { name: 'nav.accounts', href: '/accounts', icon: Users },
     { name: 'nav.machineId', href: '/machine-id', icon: Fingerprint },
     { name: 'nav.settings', href: '/settings', icon: Settings },
+    { name: 'nav.data', href: '/data', icon: Database },
   ]
 
   const toggleTheme = () => {
     setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark')
+  }
+
+  // Mouse-wheel drag: convert vertical wheel deltas into horizontal nav
+  // scrolling so the strip can be swiped with the wheel like a touch swipe.
+  const handleNavWheel = (event: WheelEvent<HTMLElement>) => {
+    const el = event.currentTarget
+    if (el.scrollWidth <= el.clientWidth) return
+    if (event.deltaY === 0) return
+    event.preventDefault()
+    el.scrollLeft += event.deltaY
   }
 
   return (
@@ -53,7 +66,7 @@ export function TopNav() {
         <span className="topbar-brand-name" data-tauri-drag-region>LutraCredentials</span>
       </div>
 
-      <nav className="topbar-links" aria-label={t('workbench.navigation')}>
+      <nav className="topbar-links" aria-label={t('workbench.navigation')} onWheel={handleNavWheel}>
         {navigation.map((item) => (
           <NavLink
             key={item.name}
@@ -70,7 +83,7 @@ export function TopNav() {
       <div className="topbar-spacer" data-tauri-drag-region />
 
       <div className="topbar-utilities">
-        <span className="topbar-version">v{packageJson.version}</span>
+        <VersionMenu />
         <Button
           variant="ghost"
           size="sm"
