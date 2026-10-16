@@ -184,7 +184,7 @@ export function Settings() {
               <span className="text-xs uppercase tracking-wider text-muted-foreground">
                 {t('settings.author')}
               </span>
-              <p className="mt-1 text-base font-medium">Adnaan</p>
+              <p className="mt-1 text-base font-medium">adnaan</p>
             </div>
             <div className="rounded-lg border border-border bg-background px-4 py-3">
               <span className="text-xs uppercase tracking-wider text-muted-foreground">
