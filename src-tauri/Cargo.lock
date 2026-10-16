@@ -2266,6 +2266,7 @@ dependencies = [
  "bytes",
  "chrono",
  "dirs 5.0.1",
+ "encoding_rs",
  "futures",
  "http",
  "once_cell",

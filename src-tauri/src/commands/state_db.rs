@@ -196,6 +196,7 @@ pub fn extract_version(raw: &str) -> String {
 }
 
 pub fn get_cli_version(app: StateDbApp) -> Option<String> {
+    use crate::utils::encoding::decode_console_output;
     use std::process::Command;
 
     #[cfg(target_os = "windows")]
@@ -217,8 +218,8 @@ pub fn get_cli_version(app: StateDbApp) -> Option<String> {
 
     match output {
         Ok(result) if result.status.success() => {
-            let stdout = String::from_utf8_lossy(&result.stdout).trim().to_string();
-            let stderr = String::from_utf8_lossy(&result.stderr).trim().to_string();
+            let stdout = decode_console_output(&result.stdout).trim().to_string();
+            let stderr = decode_console_output(&result.stderr).trim().to_string();
             let raw = if stdout.is_empty() { stderr } else { stdout };
 
             if raw.is_empty() {

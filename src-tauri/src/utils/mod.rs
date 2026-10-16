@@ -1,5 +1,6 @@
 pub mod common;
 pub mod config;
+pub mod encoding;
 pub mod db_inject;
 pub mod http;
 pub mod local_secret_storage;

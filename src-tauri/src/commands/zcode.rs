@@ -405,7 +405,7 @@ fn zcode_os_version() -> String {
         .stdin(std::process::Stdio::null())
         .output()
     {
-        let value = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        let value = crate::utils::encoding::decode_console_output(&output.stdout).trim().to_string();
         if output.status.success() && !value.is_empty() {
             return value;
         }

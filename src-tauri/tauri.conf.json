@@ -14,10 +14,10 @@
     "windows": [
       {
         "title": "LutraCredentials",
-        "width": 1200,
-        "height": 800,
-        "minWidth": 1000,
-        "minHeight": 700,
+        "width": 960,
+        "height": 640,
+        "minWidth": 800,
+        "minHeight": 540,
         "decorations": false,
         "transparent": false,
         "visible": true,

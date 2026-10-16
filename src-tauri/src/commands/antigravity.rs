@@ -356,6 +356,7 @@ pub async fn antigravity_switch_account(
 
 /// Get Antigravity platform version
 pub fn get_antigravity_version() -> Option<String> {
+    use crate::utils::encoding::decode_console_output;
     use crate::utils::logger::{log_debug, log_info};
     use std::process::Command;
 
@@ -387,8 +388,8 @@ pub fn get_antigravity_version() -> Option<String> {
 
     match output {
         Ok(out) => {
-            let stdout = String::from_utf8_lossy(&out.stdout).trim().to_string();
-            let stderr = String::from_utf8_lossy(&out.stderr).trim().to_string();
+            let stdout = decode_console_output(&out.stdout).trim().to_string();
+            let stderr = decode_console_output(&out.stderr).trim().to_string();
 
             log_info(&format!(
                 "Antigravity command executed - status: {}, stdout: '{}', stderr: '{}'",
@@ -426,8 +427,8 @@ pub fn get_antigravity_version() -> Option<String> {
                 };
 
                 if let Ok(out_v) = output_v {
-                    let stdout_v = String::from_utf8_lossy(&out_v.stdout).trim().to_string();
-                    let stderr_v = String::from_utf8_lossy(&out_v.stderr).trim().to_string();
+                    let stdout_v = decode_console_output(&out_v.stdout).trim().to_string();
+                    let stderr_v = decode_console_output(&out_v.stderr).trim().to_string();
 
                     log_info(&format!(
                         "Antigravity -v command executed - status: {}, stdout: '{}', stderr: '{}'",

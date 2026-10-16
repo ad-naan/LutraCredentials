@@ -616,7 +616,7 @@ pub fn close_antigravity(#[allow(unused_variables)] timeout_secs: u64) -> Result
                             success_count += 1;
                         } else {
                             fail_count += 1;
-                            let stderr = String::from_utf8_lossy(&output.stderr);
+                            let stderr = crate::utils::encoding::decode_console_output(&output.stderr);
                             if !stderr.contains("not found") && !stderr.is_empty() {
                                 log_warn(&format!("Failed to kill PID {}: {}", pid, stderr.trim()));
                             }

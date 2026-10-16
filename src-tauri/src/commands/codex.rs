@@ -303,6 +303,7 @@ pub async fn get_codex_config(app: AppHandle) -> Result<Value, String> {
 
 /// Get Codex platform version
 pub fn get_codex_version() -> Option<String> {
+    use crate::utils::encoding::decode_console_output;
     use crate::utils::logger::{log_debug, log_info};
     use std::process::Command;
 
@@ -325,8 +326,8 @@ pub fn get_codex_version() -> Option<String> {
 
     match output {
         Ok(out) => {
-            let stdout = String::from_utf8_lossy(&out.stdout).trim().to_string();
-            let stderr = String::from_utf8_lossy(&out.stderr).trim().to_string();
+            let stdout = decode_console_output(&out.stdout).trim().to_string();
+            let stderr = decode_console_output(&out.stderr).trim().to_string();
 
             log_info(&format!(
                 "Codex command executed - status: {}, stdout: '{}', stderr: '{}'",

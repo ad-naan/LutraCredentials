@@ -403,8 +403,8 @@ pub fn get_github_copilot_version() -> Option<String> {
 
         if let Ok(result) = output {
             if result.status.success() {
-                let stdout = String::from_utf8_lossy(&result.stdout).trim().to_string();
-                let stderr = String::from_utf8_lossy(&result.stderr).trim().to_string();
+                let stdout = crate::utils::encoding::decode_console_output(&result.stdout).trim().to_string();
+                let stderr = crate::utils::encoding::decode_console_output(&result.stderr).trim().to_string();
                 let raw = if stdout.is_empty() { stderr } else { stdout };
 
                 if !raw.is_empty() {
