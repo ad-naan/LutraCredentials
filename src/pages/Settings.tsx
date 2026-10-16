@@ -647,7 +647,7 @@ export function Settings() {
             </div>
             <div>
               <CardTitle className="text-xl">{t('settings.about')}</CardTitle>
-              <p className="mt-1 text-sm text-muted-foreground">Nexus Account Manager</p>
+              <p className="mt-1 text-sm text-muted-foreground">LutraCredentials</p>
             </div>
           </div>
         </CardHeader>

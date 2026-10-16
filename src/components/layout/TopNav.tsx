@@ -30,9 +30,11 @@ export function TopNav() {
       {/* Logo */}
       <div className="flex items-center gap-10">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
-            <span className="font-bold text-lg">N</span>
-          </div>
+          <img
+            src="/logo.png"
+            alt="Lutra"
+            className="h-9 w-9 rounded-lg object-cover ring-1 ring-border"
+          />
           <div className="flex flex-col">
             <h1 className="text-xl font-bold text-foreground tracking-tight">
               {t('app.name')}

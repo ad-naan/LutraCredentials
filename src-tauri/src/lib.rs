@@ -79,6 +79,49 @@ pub fn run() {
                 }
             }
 
+            // Migrate data from the legacy identifier directory (com.nexus.account-manager)
+            // so existing accounts survive the rebrand to com.lutra.credentials.
+            {
+                use tauri::Manager;
+                fn copy_dir_recursive(src: &std::path::Path, dst: &std::path::Path) -> std::io::Result<()> {
+                    std::fs::create_dir_all(dst)?;
+                    for entry in std::fs::read_dir(src)? {
+                        let entry = entry?;
+                        let file_type = entry.file_type()?;
+                        let target = dst.join(entry.file_name());
+                        if file_type.is_dir() {
+                            copy_dir_recursive(&entry.path(), &target)?;
+                        } else {
+                            std::fs::copy(entry.path(), target)?;
+                        }
+                    }
+                    Ok(())
+                }
+
+                if let Ok(new_dir) = app.path().app_data_dir() {
+                    let initialized = new_dir.join("accounts.json").exists()
+                        || new_dir.join("config.json").exists();
+                    if !initialized {
+                        if let Ok(data_base) = app.path().data_dir() {
+                            let legacy_dir = data_base.join("com.nexus.account-manager");
+                            if legacy_dir.is_dir() {
+                                match copy_dir_recursive(&legacy_dir, &new_dir) {
+                                    Ok(()) => log_info(&format!(
+                                        "Migrated legacy app data from {} to {}",
+                                        legacy_dir.display(),
+                                        new_dir.display()
+                                    )),
+                                    Err(error) => log_error(&format!(
+                                        "Failed to migrate legacy app data: {}",
+                                        error
+                                    )),
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Initialize storage
             let storage = Storage::load(&app.handle()).unwrap_or_else(|e| {
                 log_error(&format!("Failed to load storage: {}", e));
@@ -110,7 +153,7 @@ pub fn run() {
             let _tray = TrayIconBuilder::new()
                 .icon(icon)
                 .menu(&menu)
-                .tooltip("Nexus Account Manager")
+                .tooltip("LutraCredentials")
                 .on_menu_event(move |app, event| {
                     let event_id = event.id().as_ref();
                     match event_id {
@@ -256,6 +299,21 @@ pub fn run() {
             // Gemini 命令
             gemini::switch_gemini_account,
             gemini::get_gemini_config,
+            // Grok 命令
+            grok::grok_oauth_login_start,
+            grok::grok_oauth_login_complete,
+            grok::grok_oauth_login_cancel,
+            grok::grok_import_from_local,
+            grok::refresh_grok_token,
+            grok::switch_grok_account,
+            // Zcode 命令
+            zcode::zcode_oauth_login_start,
+            zcode::zcode_oauth_submit_callback_url,
+            zcode::zcode_oauth_login_complete,
+            zcode::zcode_oauth_login_cancel,
+            zcode::zcode_import_from_local,
+            zcode::refresh_zcode_token,
+            zcode::switch_zcode_account,
             // Provider 命令
             commands::provider::get_claude_provider_config,
             commands::provider::apply_claude_provider,

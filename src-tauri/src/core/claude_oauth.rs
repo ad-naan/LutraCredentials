@@ -31,7 +31,7 @@ const SCOPES: [&str; 6] = [
     "user:file_upload",
 ];
 
-const USER_AGENT: &str = "nexus-account-manager";
+const USER_AGENT: &str = "lutra-credentials";
 
 /// OAuth 登录会话凭据（state + code_verifier 由前端在登录期间持有）
 #[derive(Debug, Serialize, Deserialize, Clone)]

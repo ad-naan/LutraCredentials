@@ -2178,6 +2178,41 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
 
 [[package]]
+name = "lutra-credentials"
+version = "1.0.3"
+dependencies = [
+ "aes-gcm",
+ "base64 0.22.1",
+ "chrono",
+ "dirs 5.0.1",
+ "once_cell",
+ "rand 0.8.5",
+ "regex",
+ "reqwest 0.12.28",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha1",
+ "sha2",
+ "sysinfo",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-opener",
+ "tauri-plugin-shell",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-updater",
+ "tokio",
+ "toml 1.0.1+spec-1.1.0",
+ "tracing",
+ "url",
+ "urlencoding",
+ "uuid",
+ "windows 0.58.0",
+ "winreg",
+]
+
+[[package]]
 name = "mac"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2335,41 +2370,6 @@ name = "new_debug_unreachable"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "650eef8c711430f1a879fdd01d4745a7deea475becfb90269c06775983bbf086"
-
-[[package]]
-name = "nexus-account-manager"
-version = "1.0.3"
-dependencies = [
- "aes-gcm",
- "base64 0.22.1",
- "chrono",
- "dirs 5.0.1",
- "once_cell",
- "rand 0.8.5",
- "regex",
- "reqwest 0.12.28",
- "rusqlite",
- "serde",
- "serde_json",
- "sha1",
- "sha2",
- "sysinfo",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-opener",
- "tauri-plugin-shell",
- "tauri-plugin-single-instance",
- "tauri-plugin-updater",
- "tokio",
- "toml 1.0.1+spec-1.1.0",
- "tracing",
- "url",
- "urlencoding",
- "uuid",
- "windows 0.58.0",
- "winreg",
-]
 
 [[package]]
 name = "nodrop"

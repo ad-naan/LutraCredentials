@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Kiro 平台 - Token 导入方式
  * 
  * 支持 SSO Token 和 OIDC 凭证批量导入
@@ -20,7 +20,7 @@ type ImportType = 'sso' | 'oidc'
 
 export function TokenImportMethod({ onSuccess, onError, onClose }: AddMethodProps) {
     const { t } = useTranslation()
-    const isEn = t('app.name') !== 'Nexus 账号管理器'
+    const isEn = t('app.name') !== 'Lutra 账号管理器'
 
     const [importType, setImportType] = useState<ImportType>('sso')
     const [status, setStatus] = useState<Status>('idle')

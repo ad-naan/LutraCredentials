@@ -15,6 +15,8 @@ const [
   qoderConfig,
   traeConfig,
   zedConfig,
+  grokConfig,
+  zcodeConfig,
   workbuddyConfig,
 ] = externalPlatformConfigs
 
@@ -33,6 +35,8 @@ export const platforms: PlatformConfig[] = [
   traeConfig,
   zedConfig,
   workbuddyConfig,
+  grokConfig,
+  zcodeConfig,
 ]
 
 export const platformRegistry: PlatformRegistry = new Map(

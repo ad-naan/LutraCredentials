@@ -1,5 +1,5 @@
 [package]
-name = "nexus-account-manager"
+name = "lutra-credentials"
 version = "1.0.3"
 description = "A unified multi-platform AI account management tool"
 authors = ["adnaan", "027xigupi"]
@@ -11,7 +11,7 @@ edition = "2021"
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
-name = "nexus_account_manager_lib"
+name = "lutra_credentials_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
@@ -42,6 +42,7 @@ regex = "1"
 sysinfo = "0.32"
 sha1 = "0.10"
 sha2 = "0.10"
+aes-gcm = "0.10"
 toml = "1.0.1"
 
 [target.'cfg(windows)'.dependencies]

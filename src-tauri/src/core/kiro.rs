@@ -81,7 +81,7 @@ pub async fn register_client() -> Result<(String, String), String> {
     let url = format!("{}/client/register", OIDC_BASE_URL);
 
     let payload = serde_json::json!({
-        "clientName": "Nexus Account Manager",
+        "clientName": "LutraCredentials",
         "clientType": "public",
         "scopes": [
             "codewhisperer:analysis",

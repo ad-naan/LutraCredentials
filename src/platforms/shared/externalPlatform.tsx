@@ -526,7 +526,7 @@ function createExternalLocalImportMethod(definition: ExternalPlatformDefinition)
             </p>
             <p className="text-xs leading-5 text-muted-foreground">
               {definition.localImportDescription ||
-                `Read the current ${definition.name} login state from this machine and save it into Nexus.`}
+                `Read the current ${definition.name} login state from this machine and save it into Lutra.`}
             </p>
           </div>
         </div>
@@ -627,8 +627,8 @@ function createExternalTokenMethod(definition: ExternalPlatformDefinition) {
             <p className="text-sm font-semibold">Import by Token</p>
             <p className="text-xs leading-5 text-muted-foreground">
               {canResolveToken
-                ? `Paste a ${definition.name} access token and let Nexus resolve the account metadata automatically.`
-                : `Add a ${definition.name} account from an access token and keep it switchable in Nexus.`}
+                ? `Paste a ${definition.name} access token and let Lutra resolve the account metadata automatically.`
+                : `Add a ${definition.name} account from an access token and keep it switchable in Lutra.`}
             </p>
           </div>
         </div>
@@ -821,7 +821,7 @@ function createExternalOAuthMethod(definition: ExternalPlatformDefinition) {
             <p className="text-sm font-semibold">OAuth Authorization</p>
             <p className="text-xs leading-5 text-muted-foreground">
               Sign in through the official {definition.name} authorization flow and import the
-              resulting account into Nexus.
+              resulting account into Lutra.
             </p>
           </div>
         </div>

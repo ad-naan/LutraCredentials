@@ -8,6 +8,7 @@ pub mod codex;
 pub mod cursor;
 pub mod gemini;
 pub mod github_copilot;
+pub mod grok;
 pub mod import;
 pub mod kiro;
 pub mod machine;
@@ -17,6 +18,7 @@ pub mod state_db;
 pub mod trae;
 pub mod updater;
 pub mod windsurf;
+pub mod zcode;
 pub mod zed;
 
 pub struct AppState {

@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    nexus_account_manager_lib::run()
+    lutra_credentials_lib::run()
 }
