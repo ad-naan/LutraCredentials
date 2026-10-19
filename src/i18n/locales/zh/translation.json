@@ -387,7 +387,17 @@
         "autoRefreshEnable": "启用自动刷新",
         "autoRefreshInterval": "检测间隔",
         "autoRefreshMinutes": "{{count}} 分钟",
-        "autoRefreshSaved": "已更新自动刷新设置"
+        "autoRefreshSaved": "已更新自动刷新设置",
+        "snapshotTitle": "配置快照",
+        "snapshotDesc": "每次一键切号前自动留存目标平台的本地配置文件，切号失败或配置异常时可一键恢复。",
+        "snapshotEmpty": "暂无快照，执行一键切号后会自动留存。",
+        "snapshotFiles": "{{count}} 个文件",
+        "snapshotRestore": "恢复",
+        "snapshotRestoreHint": "把快照中的配置文件写回原路径（会覆盖当前配置）",
+        "snapshotDelete": "删除该快照",
+        "snapshotClearAll": "清空全部快照",
+        "snapshotCleared": "已清空全部快照",
+        "snapshotRestored": "已恢复 {{platform}} 的配置快照"
     },
     "data": {
         "title": "数据与路径",
@@ -513,6 +523,28 @@
         "scanning": "正在扫描会话...",
         "noData": "暂无用量数据",
         "peak": "峰值 {{count}}"
+    },
+    "tray": {
+        "switched": "已切换到 {{account}}",
+        "switchFailed": "切换 {{account}} 失败",
+        "accountMissing": "账号不存在或已删除"
+    },
+    "health": {
+        "title": "账号健康度",
+        "checkAll": "一键体检",
+        "checkHint": "对支持状态检测的 {{count}} 个账号执行检测",
+        "checkUnsupported": "当前没有支持状态检测的账号",
+        "refreshExpiring": "刷新过期凭据",
+        "refreshExpiringHint": "立即检查并自动刷新即将过期的凭据",
+        "manage": "去处理",
+        "expiresIn": "{{time}}过期",
+        "expiredAgo": "已过期（{{time}}）",
+        "level": {
+            "ok": "正常",
+            "warning": "即将过期",
+            "danger": "已过期",
+            "error": "状态异常"
+        }
     },
     "proxy": {
         "title": "本地路由代理",

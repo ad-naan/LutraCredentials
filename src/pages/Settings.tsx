@@ -9,6 +9,7 @@ import { UpdateDialog } from '@/components/dialogs/UpdateDialog'
 import { ChangelogDialog } from '@/components/dialogs/ChangelogDialog'
 import { CHANGELOG } from '@/data/changelog'
 import { ProxySettings } from '@/components/common/ProxySettings'
+import { SnapshotSettings } from '@/components/common/SnapshotSettings'
 import { usePlatformStore } from '@/stores/usePlatformStore'
 import { toast } from '@/lib/toast'
 import { invoke } from '@tauri-apps/api/core'
@@ -120,6 +121,8 @@ export function Settings() {
       </Card>
 
       <ProxySettings />
+
+      <SnapshotSettings />
 
       <Card className="border-border bg-card shadow-sm">
         <CardHeader className="border-b border-border pb-4">

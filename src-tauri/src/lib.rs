@@ -149,8 +149,8 @@ pub fn run() {
                 .cloned()
                 .expect("Failed to get app icon");
 
-            // Build tray icon
-            let _tray = TrayIconBuilder::new()
+            // Build tray icon (with a stable id so commands can look it up later)
+            let _tray = TrayIconBuilder::with_id("main")
                 .icon(icon)
                 .menu(&menu)
                 .tooltip("LutraCredentials")
@@ -167,6 +167,19 @@ pub fn run() {
                         id if id == quit_id => {
                             log_info("Quit from tray menu");
                             app.exit(0);
+                        }
+                        id if id.starts_with("switch:") => {
+                            // 托盘快速切号：把账号 id 转发给前端，走统一的 switchAccount 流程
+                            let account_id = id.strip_prefix("switch:").unwrap_or_default().to_string();
+                            if account_id.is_empty() {
+                                return;
+                            }
+                            log_info(&format!("Tray switch account requested: {}", account_id));
+                            let _ = app.emit("tray-switch-account", account_id);
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
                         }
                         _ => {}
                     }
@@ -343,6 +356,14 @@ pub fn run() {
             // Updater 命令
             updater::check_for_updates,
             updater::download_and_install_update,
+            // 托盘快速切号
+            tray::update_tray_menu,
+            // 切号前配置快照与回滚
+            snapshot::create_switch_snapshot,
+            snapshot::list_switch_snapshots,
+            snapshot::restore_switch_snapshot,
+            snapshot::delete_switch_snapshot,
+            snapshot::clear_switch_snapshots,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

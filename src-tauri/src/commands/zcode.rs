@@ -284,11 +284,11 @@ fn default_credentials_path() -> Result<PathBuf, String> {
     Ok(resolve_default_v2_dir()?.join(CREDENTIALS_FILE))
 }
 
-fn default_config_path() -> Result<PathBuf, String> {
+pub(crate) fn default_config_path() -> Result<PathBuf, String> {
     Ok(resolve_default_v2_dir()?.join(CONFIG_FILE))
 }
 
-fn default_settings_path() -> Result<PathBuf, String> {
+pub(crate) fn default_settings_path() -> Result<PathBuf, String> {
     Ok(resolve_default_v2_dir()?.join(SETTINGS_FILE))
 }
 

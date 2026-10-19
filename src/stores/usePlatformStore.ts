@@ -239,6 +239,13 @@ export const usePlatformStore = create<PlatformStore>((set, get) => ({
       throw new Error(`${account.platform} 平台不支持一键切号`)
     }
 
+    // 切号前先留存当前配置快照，失败可在设置页回滚（不支持文件快照的平台静默跳过）
+    try {
+      await invoke('create_switch_snapshot', { platform: account.platform })
+    } catch (error) {
+      logError('Failed to create switch snapshot:', error)
+    }
+
     const patch = (await ops.switchAccount(account)) || {}
 
     // 同一平台仅保留一个活跃账号

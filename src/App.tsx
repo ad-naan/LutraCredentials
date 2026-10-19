@@ -8,6 +8,7 @@ import { Settings } from './pages/Settings'
 import { Data } from './pages/Data'
 import { ThemeManager } from './components/common/ThemeManager'
 import { useEffect } from 'react'
+import { useTrayQuickSwitch } from './hooks/useTrayQuickSwitch'
 import { usePlatformStore } from './stores/usePlatformStore'
 import { Toaster } from "@/components/ui/sonner"
 
@@ -18,6 +19,9 @@ function App() {
   const checkAndRefreshExpiringTokens = usePlatformStore(
     (state) => state.checkAndRefreshExpiringTokens,
   )
+
+  // 系统托盘快速切号（菜单同步 + 切号事件）
+  useTrayQuickSwitch()
 
   useEffect(() => {
     // 应用启动时加载所有账户，随后立即执行一次过期凭据检查：

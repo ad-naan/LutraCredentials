@@ -123,6 +123,22 @@
 .usage-stat-label { display: flex; align-items: center; gap: 6px; color: hsl(var(--muted-foreground)); font-size: 11px; white-space: nowrap; }
 .usage-stat-label svg { width: 12px; height: 12px; color: hsl(var(--primary)); }
 .usage-stat-value { margin-top: 4px; font-size: 20px; font-weight: 600; line-height: 1.2; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+
+/* ===================== 账号健康度 ===================== */
+.health-actions { display: flex; align-items: center; gap: 8px; }
+.health-body { display: flex; flex-direction: column; gap: 14px; padding: 14px 16px 18px; }
+.health-chips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.health-chip { min-width: 0; padding: 10px 12px; border: 1px solid hsl(var(--border)); border-radius: 8px; background: hsl(var(--background) / 40%); }
+.health-chip-label { display: flex; align-items: center; gap: 6px; color: hsl(var(--muted-foreground)); font-size: 11px; white-space: nowrap; }
+.health-chip-label svg { width: 12px; height: 12px; }
+.health-chip-value { margin-top: 4px; font-size: 20px; font-weight: 600; line-height: 1.2; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.health-chip-ok svg { color: hsl(var(--success)); }
+.health-chip-warning svg { color: hsl(var(--warning)); }
+.health-chip-danger svg, .health-chip-error svg { color: hsl(var(--destructive)); }
+.health-problems { display: flex; flex-direction: column; }
+.health-row { display: flex; width: 100%; min-width: 0; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid hsl(var(--border)); }
+.health-row:last-child { border-bottom: 0; }
+.health-row-error { margin-top: 2px; font-size: 11px; color: hsl(var(--destructive)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 360px; }
 .usage-section { display: flex; flex-direction: column; gap: 8px; }
 .usage-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .usage-section-title { color: hsl(var(--muted-foreground)); font-size: 11px; font-weight: 550; text-transform: uppercase; letter-spacing: .04em; }

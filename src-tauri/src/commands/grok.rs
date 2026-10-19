@@ -122,7 +122,7 @@ fn validate_xai_endpoint(raw: &str, field: &str) -> Result<String, String> {
     Ok(parsed.to_string())
 }
 
-fn grok_home_dir() -> Result<PathBuf, String> {
+pub(crate) fn grok_home_dir() -> Result<PathBuf, String> {
     let home = dirs::home_dir().ok_or_else(|| "Failed to resolve home directory".to_string())?;
     Ok(home.join(".grok"))
 }

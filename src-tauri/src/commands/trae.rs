@@ -53,7 +53,7 @@ pub fn detect_trae_storage_path() -> Result<PathBuf, String> {
     Err("Trae is not supported on this platform".to_string())
 }
 
-fn resolve_trae_storage_path() -> Result<PathBuf, String> {
+pub(crate) fn resolve_trae_storage_path() -> Result<PathBuf, String> {
     if let Some(configured_path) = crate::utils::config::get_config_string(TRAE_STORAGE_PATH_CONFIG_KEY)? {
         return Ok(PathBuf::from(configured_path));
     }

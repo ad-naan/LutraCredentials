@@ -387,7 +387,17 @@
         "autoRefreshEnable": "Enable auto refresh",
         "autoRefreshInterval": "Check interval",
         "autoRefreshMinutes": "{{count}} min",
-        "autoRefreshSaved": "Auto refresh settings updated"
+        "autoRefreshSaved": "Auto refresh settings updated",
+        "snapshotTitle": "Config Snapshots",
+        "snapshotDesc": "Before every account switch, the target platform's local config files are snapshotted automatically. Restore one if a switch fails or config breaks.",
+        "snapshotEmpty": "No snapshots yet. They are created automatically on account switch.",
+        "snapshotFiles": "{{count}} files",
+        "snapshotRestore": "Restore",
+        "snapshotRestoreHint": "Write the snapshotted config files back to their original paths (overwrites current config)",
+        "snapshotDelete": "Delete this snapshot",
+        "snapshotClearAll": "Clear all snapshots",
+        "snapshotCleared": "All snapshots cleared",
+        "snapshotRestored": "Restored config snapshot for {{platform}}"
     },
     "data": {
         "title": "Data & Paths",
@@ -514,6 +524,28 @@
         "scanning": "Scanning sessions...",
         "noData": "No usage data yet",
         "peak": "Peak {{count}}"
+    },
+    "tray": {
+        "switched": "Switched to {{account}}",
+        "switchFailed": "Failed to switch to {{account}}",
+        "accountMissing": "Account not found or deleted"
+    },
+    "health": {
+        "title": "Account Health",
+        "checkAll": "Check All",
+        "checkHint": "Run status checks on {{count}} accounts that support detection",
+        "checkUnsupported": "No accounts support status detection yet",
+        "refreshExpiring": "Refresh Expiring",
+        "refreshExpiringHint": "Check now and auto-refresh credentials that are about to expire",
+        "manage": "Resolve",
+        "expiresIn": "Expires in {{time}}",
+        "expiredAgo": "Expired {{time}} ago",
+        "level": {
+            "ok": "Healthy",
+            "warning": "Expiring soon",
+            "danger": "Expired",
+            "error": "Error"
+        }
     },
     "proxy": {
         "title": "Local Routing Proxy",
