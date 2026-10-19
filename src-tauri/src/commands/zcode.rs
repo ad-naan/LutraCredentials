@@ -258,7 +258,7 @@ fn write_json_map_with_backup(path: &Path, values: &Map<String, Value>) -> Resul
     }
     let content = serde_json::to_string_pretty(&Value::Object(values.clone()))
         .map_err(|error| format!("Failed to serialize {}: {}", path.display(), error))?;
-    std::fs::write(path, content)
+    crate::utils::common::write_atomic(path, &content)
         .map_err(|error| format!("Failed to write {}: {}", path.display(), error))
 }
 
@@ -455,7 +455,7 @@ fn zcode_device_mid() -> Result<String, String> {
     let value = Uuid::new_v4().to_string();
     std::fs::create_dir_all(&data_dir)
         .map_err(|error| format!("Failed to create Zcode data directory: {}", error))?;
-    std::fs::write(&path, &value)
+    crate::utils::common::write_atomic(&path, &value)
         .map_err(|error| format!("Failed to persist Zcode device id: {}", error))?;
     Ok(value)
 }

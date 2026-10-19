@@ -783,7 +783,7 @@ pub fn switch_grok_account(
 
     let content = serde_json::to_string_pretty(&auth_raw)
         .map_err(|error| format!("Failed to serialize Grok auth.json: {}", error))?;
-    std::fs::write(&auth_path, content)
+    crate::utils::common::write_atomic(&auth_path, &content)
         .map_err(|error| format!("Failed to write Grok auth.json: {}", error))?;
     log_info(&format!(
         "[Grok Switch] Synced official login to {}",

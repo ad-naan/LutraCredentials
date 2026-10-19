@@ -186,7 +186,7 @@ fn write_storage_json(path: &Path, value: &Value) -> Result<(), String> {
     let content = serde_json::to_string_pretty(value)
         .map_err(|error| format!("Failed to serialize Trae storage: {}", error))?;
 
-    fs::write(path, content)
+    crate::utils::common::write_atomic(path, &content)
         .map_err(|error| format!("Failed to write Trae storage '{}': {}", path.display(), error))
 }
 

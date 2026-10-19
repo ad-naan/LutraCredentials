@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use crate::utils::common::write_atomic;
 use crate::utils::logger::{log_debug, log_info};
 use std::fs;
 use std::path::PathBuf;
@@ -92,7 +93,7 @@ impl Storage {
         let content = serde_json::to_string_pretty(self)
             .map_err(|e| format!("Failed to serialize storage: {}", e))?;
 
-        fs::write(&path, content).map_err(|e| format!("Failed to write storage: {}", e))?;
+        write_atomic(&path, &content).map_err(|e| format!("Failed to write storage: {}", e))?;
 
         log_info(&format!(
             "Saved {} accounts to {}",
@@ -205,7 +206,8 @@ fn save_custom_path_to_config(app: &AppHandle, path: Option<&PathBuf>) -> Result
     let content = serde_json::to_string_pretty(&config)
         .map_err(|e| format!("Failed to serialize config: {}", e))?;
 
-    fs::write(&config_path, content).map_err(|e| format!("Failed to write config: {}", e))?;
+    write_atomic(&config_path, &content)
+        .map_err(|e| format!("Failed to write config: {}", e))?;
 
     Ok(())
 }

@@ -123,7 +123,8 @@ pub async fn backup_accounts(
         }
     }
 
-    fs::write(&target, payload.as_bytes()).map_err(|e| format!("写入备份文件失败: {}", e))?;
+    crate::utils::common::write_atomic(&target, &payload)
+        .map_err(|e| format!("写入备份文件失败: {}", e))?;
 
     let result = BackupResult {
         path: target.to_string_lossy().to_string(),

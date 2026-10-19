@@ -1,3 +1,4 @@
+use crate::utils::common::write_atomic;
 use crate::utils::logger::{log_error, log_info};
 use serde_json::{json, Value};
 use std::fs;
@@ -88,7 +89,7 @@ fn write_config_toml(app: &AppHandle, config: &Value) -> Result<(), String> {
     let toml_content = config_to_toml(config)?;
 
     // Write config to file
-    fs::write(&config_path, toml_content)
+    write_atomic(&config_path, &toml_content)
         .map_err(|e| format!("Failed to write config.toml: {}", e))?;
 
     log_info(&format!(
@@ -114,7 +115,7 @@ fn write_auth_json(app: &AppHandle, auth: &Value) -> Result<(), String> {
     let auth_str = serde_json::to_string_pretty(auth)
         .map_err(|e| format!("Failed to serialize auth.json: {}", e))?;
 
-    fs::write(&auth_path, auth_str).map_err(|e| format!("Failed to write auth.json: {}", e))?;
+    write_atomic(&auth_path, &auth_str).map_err(|e| format!("Failed to write auth.json: {}", e))?;
 
     log_info(&format!(
         "Successfully updated Codex auth.json at: {}",
@@ -155,7 +156,7 @@ fn write_codex_config_atomic(app: &AppHandle, auth: &Value, config: &Value) -> R
 
         // Rollback auth.json
         if let Some(bytes) = old_auth {
-            let _ = fs::write(&auth_path, bytes);
+            let _ = crate::utils::common::write_atomic_bytes(&auth_path, &bytes);
         } else {
             let _ = fs::remove_file(&auth_path);
         }

@@ -2,7 +2,35 @@
 //!
 //! 提供跨平台复用的工具函数
 
+use std::fs;
+use std::path::Path;
 use uuid::Uuid;
+
+/// 原子写入：先写同目录临时文件，再 rename 替换目标文件。
+///
+/// 直接 `fs::write` 在写入中途崩溃 / 断电会留下截断的半份文件，
+/// 对账号库、第三方工具配置（auth.json / settings.json 等）都是致损的；
+/// rename 在同一卷上是原子的（Windows 上 `std::fs::rename` 内部使用
+/// MOVEFILE_REPLACE_EXISTING，可覆盖已存在文件）。
+pub fn write_atomic(path: &Path, content: &str) -> Result<(), String> {
+    write_atomic_bytes(path, content.as_bytes())
+}
+
+/// `write_atomic` 的字节版本（用于回滚原始字节内容等场景）。
+pub fn write_atomic_bytes(path: &Path, bytes: &[u8]) -> Result<(), String> {
+    let tmp_path = path.with_extension("tmp");
+
+    fs::write(&tmp_path, bytes)
+        .map_err(|e| format!("Failed to write temp file {}: {}", tmp_path.display(), e))?;
+
+    if let Err(e) = fs::rename(&tmp_path, path) {
+        // 替换失败时清理残留临时文件，避免下次写入被旧内容干扰
+        let _ = fs::remove_file(&tmp_path);
+        return Err(format!("Failed to replace file {}: {}", path.display(), e));
+    }
+
+    Ok(())
+}
 
 /// 生成账号 ID
 pub fn generate_account_id() -> String {

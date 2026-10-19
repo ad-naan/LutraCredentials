@@ -103,7 +103,8 @@ fn save_full_config(config: &serde_json::Value) -> Result<(), String> {
     let content = serde_json::to_string_pretty(config)
         .map_err(|e| format!("Failed to serialize config: {}", e))?;
 
-    fs::write(&config_path, content).map_err(|e| format!("Failed to write config file: {}", e))?;
+    crate::utils::common::write_atomic(&config_path, &content)
+        .map_err(|e| format!("Failed to write config file: {}", e))?;
 
     Ok(())
 }

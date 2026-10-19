@@ -1,3 +1,4 @@
+use crate::utils::common::{write_atomic, write_atomic_bytes};
 use crate::utils::logger::{log_error, log_info};
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -98,7 +99,7 @@ fn write_gemini_env(app: &AppHandle, env: &Value) -> Result<(), String> {
     let env_content = serialize_env_text(&env_map);
 
     // Write to file
-    fs::write(&env_path, env_content).map_err(|e| format!("Failed to write .env: {}", e))?;
+    write_atomic(&env_path, &env_content).map_err(|e| format!("Failed to write .env: {}", e))?;
 
     log_info(&format!(
         "Successfully updated Gemini .env at: {}",
@@ -123,7 +124,7 @@ fn write_gemini_config_json(app: &AppHandle, config: &Value) -> Result<(), Strin
     let config_str = serde_json::to_string_pretty(config)
         .map_err(|e| format!("Failed to serialize config.json: {}", e))?;
 
-    fs::write(&config_path, config_str)
+    write_atomic(&config_path, &config_str)
         .map_err(|e| format!("Failed to write config.json: {}", e))?;
 
     log_info(&format!(
@@ -149,7 +150,7 @@ fn write_gemini_settings_json(app: &AppHandle, settings: &Value) -> Result<(), S
     let settings_str = serde_json::to_string_pretty(settings)
         .map_err(|e| format!("Failed to serialize settings.json: {}", e))?;
 
-    fs::write(&settings_path, settings_str)
+    write_atomic(&settings_path, &settings_str)
         .map_err(|e| format!("Failed to write settings.json: {}", e))?;
 
     log_info(&format!(
@@ -205,7 +206,7 @@ fn write_gemini_config_atomic(
 
         // Rollback .env
         if let Some(bytes) = old_env {
-            let _ = fs::write(&env_path, bytes);
+            let _ = write_atomic_bytes(&env_path, &bytes);
         } else {
             let _ = fs::remove_file(&env_path);
         }
@@ -222,14 +223,14 @@ fn write_gemini_config_atomic(
 
         // Rollback .env
         if let Some(bytes) = old_env {
-            let _ = fs::write(&env_path, bytes);
+            let _ = write_atomic_bytes(&env_path, &bytes);
         } else {
             let _ = fs::remove_file(&env_path);
         }
 
         // Rollback config.json
         if let Some(bytes) = old_config {
-            let _ = fs::write(&config_path, bytes);
+            let _ = write_atomic_bytes(&config_path, &bytes);
         } else {
             let _ = fs::remove_file(&config_path);
         }

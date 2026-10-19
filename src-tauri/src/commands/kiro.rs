@@ -376,9 +376,9 @@ pub async fn switch_kiro_account(
         "region": region
     });
 
-    std::fs::write(
+    crate::utils::common::write_atomic(
         &token_path,
-        serde_json::to_string_pretty(&token_data).unwrap(),
+        &serde_json::to_string_pretty(&token_data).unwrap(),
     )
     .map_err(|e| format!("写入 token 文件失败: {}", e))?;
 
@@ -404,9 +404,9 @@ pub async fn switch_kiro_account(
             ]
         });
 
-        std::fs::write(
+        crate::utils::common::write_atomic(
             &client_reg_path,
-            serde_json::to_string_pretty(&client_data).unwrap(),
+            &serde_json::to_string_pretty(&client_data).unwrap(),
         )
         .map_err(|e| format!("写入客户端注册文件失败: {}", e))?;
 
